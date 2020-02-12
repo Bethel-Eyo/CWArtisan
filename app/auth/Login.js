@@ -1,9 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
-import {BackHandler, TouchableOpacity} from 'react-native';
+import {BackHandler, TouchableOpacity, Platform} from 'react-native';
 import {FloatingTitleTextInputField} from '../components/FloatingHintInput';
 
 class Login extends React.Component {
+  static navigationOptions = {
+    header: null,
+  };
   state = {
     email: '',
     password: '',
@@ -75,11 +78,19 @@ class Login extends React.Component {
       <Container>
         <Img source={require('../assets/painter.jpg')}>
           <View style={{backgroundColor: 'rgba(25,0,0,0.6)'}}>
-            <Logo source={require('../assets/cw-logo.png')} />
+            <Logo
+              source={require('../assets/cw-logo.png')}
+              style={{
+                ...Platform.select({
+                  ios: {marginTop: 35, marginLeft: 20},
+                  android: {marginTop: 10, marginLeft: 20},
+                }),
+              }}
+            />
             <Text>Welcome to Citiworksng Artisan</Text>
           </View>
         </Img>
-        <LoginContainer>
+        <LoginContainer style={{elevation: 5}}>
           <InputView>
             <IconEmail source={this.state.iconEmail} />
             <FloatingTitleTextInputField
@@ -116,7 +127,10 @@ class Login extends React.Component {
               }}
             />
           </InputView>
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              this.props.navigation.navigate('Home');
+            }}>
             <Button style={{elevation: 6}}>
               <BtnText>Login</BtnText>
             </Button>
@@ -130,7 +144,7 @@ class Login extends React.Component {
                 fontWeight: 'bold',
               }}
               onPress={() => {
-                this.props.navigation.push('ResetPass');
+                this.props.navigation.navigate('ResetPass');
               }}>
               Forgot Password?
             </FgtPass>
@@ -156,7 +170,7 @@ const InputView = styled.View`
   align-items: center;
   border-width: 0.5px;
   border-color: #596273;
-  height: 50px;
+  height: 46px;
   border-radius: 5px;
   margin: 10px 8% 5px 8%;
   background-color: #fff;
@@ -169,14 +183,14 @@ const Container = styled.View`
 `;
 
 const LoginContainer = styled.View`
-  padding-top: 20px;
+  padding-top: 5px;
   background: #ffffff;
   border: 1px solid #cccccc;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
   border-radius: 10px;
-  margin-top: 20px;
-  height: 280px;
-  width: 340px;
+  margin-top: 10px;
+  height: 240px;
+  width: 330px;
   align-items: center;
 `;
 
@@ -186,13 +200,13 @@ const TipText = styled.Text`
   text-align: center;
   font-size: 17px;
   width: 300px;
-  margin-top: 20px;
-  line-height: 25px;
+  margin-top: 5px;
+  line-height: 22px;
   color: #2c3f70;
 `;
 
 const Text = styled.Text`
-  font-size: 25px;
+  font-size: 22px;
   position: absolute;
   bottom: 20px;
   left: 20px;
@@ -207,11 +221,8 @@ const View = styled.View`
 `;
 
 const Logo = styled.Image`
-  height: 60px;
-  width: 150px;
-  position: absolute;
-  top: 30px;
-  left: 20px;
+  height: 50px;
+  width: 130px;
 `;
 
 const Img = styled.ImageBackground`
@@ -242,8 +253,8 @@ const Button = styled.View`
   align-items: center;
   border-radius: 30px;
   box-shadow: 0 5px 5px #c2cbff;
-  margin-top: 20px;
-  width: 300px;
+  margin-top: 10px;
+  width: 280px;
 `;
 
 const BtnText = styled.Text`
