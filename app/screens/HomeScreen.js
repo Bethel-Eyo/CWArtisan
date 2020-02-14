@@ -3,12 +3,24 @@ import styled from 'styled-components';
 import LinearGradient from 'react-native-linear-gradient';
 import DoubleLayout from '../components/DoubleLayout';
 import Icon from 'react-native-vector-icons/Ionicons';
-import {TouchableOpacity, Platform} from 'react-native';
+import {TouchableOpacity, Platform, Alert} from 'react-native';
+import {connect} from 'react-redux';
+
+function mapStateToProps(state) {
+  return {action: state.action};
+}
 
 class HomeScreen extends React.Component {
   static navigationOptions = {
     header: null,
   };
+
+  componentDidUpdate() {
+    if (this.props.action == 'openJobHist') {
+      this.props.navigation.navigate('JobHist');
+    }
+  }
+
   render() {
     return (
       <Container>
@@ -32,6 +44,7 @@ class HomeScreen extends React.Component {
             <TouchableOpacity
               style={{
                 position: 'absolute',
+                elevation: 3,
                 ...Platform.select({
                   ios: {right: 60, top: 35},
                   android: {right: 60, top: 15},
@@ -41,6 +54,7 @@ class HomeScreen extends React.Component {
             </TouchableOpacity>
             <Row
               style={{
+                elevation: 3,
                 ...Platform.select({
                   ios: {marginLeft: '10%', marginTop: '15%'},
                   android: {marginLeft: '10%', marginTop: '9%'},
@@ -82,8 +96,11 @@ class HomeScreen extends React.Component {
           />
         </SecondView>
         <ThirdView>
-          <TouchableOpacity>
-            <CircularView style={{elevation: 4}}>
+          <TouchableOpacity
+            onPress={() => {
+              this.props.navigation.navigate('JobZone');
+            }}>
+            <CircularView style={{elevation: 7}}>
               <Icon name="ios-paper-plane" size={30} color="#ffffff" />
             </CircularView>
           </TouchableOpacity>
@@ -93,7 +110,7 @@ class HomeScreen extends React.Component {
   }
 }
 
-export default HomeScreen;
+export default connect(mapStateToProps)(HomeScreen);
 
 const Circle = styled.View`
   height: 14px;
@@ -154,7 +171,7 @@ const SubRow = styled.View`
 `;
 
 const Column = styled.View`
-  margin-left: 25px;
+  margin-left: 20px;
   margin-top: 10px;
 `;
 
@@ -169,15 +186,18 @@ const Text = styled.Text`
   color: white;
   margin-left: 7px;
   font-weight: bold;
+  font-family: Ionicons;
 `;
 
 const Name = styled.Text`
   font-size: 21px;
   font-weight: bold;
   color: white;
+  font-family: Ionicons;
 `;
 
 const Category = styled.Text`
-  font-size: 18px;
+  font-size: 15px;
   color: white;
+  font-family: Ionicons;
 `;

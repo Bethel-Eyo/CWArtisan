@@ -2,54 +2,70 @@ import React from 'react';
 import styled from 'styled-components';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {TouchableOpacity, Alert} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import {connect} from 'react-redux';
 
-const navigation = useNavigation();
+function mapStateToProps(state) {
+  return {action: state.action};
+}
 
-const DoubleLayout = props => (
-  <Container style={{elevation: 4}}>
-    <Row>
-      <TouchableOpacity
-        onPress={() => {
-          if (props.row == 'one') {
-            Alert.alert('Wallet');
-          } else if (props.row == 'two') {
-            navigation.navigate('JobHist');
-          }
-        }}>
-        <LinearLayout>
-          <CircularView>
-            <Icon name={props.firstName} size={26} color="#C85A23" />
-          </CircularView>
-          <Text>{props.firstLabel}</Text>
-        </LinearLayout>
-      </TouchableOpacity>
-      <VerticalView />
-      <TouchableOpacity
-        onPress={() => {
-          if (props.row == 'one') {
-            Alert.alert('Job Tracker');
-          } else if (props.row == 'two') {
-            Alert.alert('Support');
-          }
-        }}>
-        <LinearLayout>
-          <CircularView style={{elevation: 4}}>
-            <Icon name={props.secondName} size={23} color="#C85A23" />
-          </CircularView>
-          <Text>{props.secondLabel}</Text>
-        </LinearLayout>
-      </TouchableOpacity>
-    </Row>
-  </Container>
-);
+function mapDispatchToProps(dispatch) {
+  return {
+    openJobHist: () =>
+      dispatch({
+        type: 'OPEN_JOB_HIST',
+      }),
+  };
+}
 
-export default DoubleLayout;
+class DoubleLayout extends React.Component {
+  render() {
+    return (
+      <Container style={{elevation: 4}}>
+        <Row>
+          <TouchableOpacity
+            onPress={() => {
+              if (this.props.row == 'one') {
+                Alert.alert('Wallet');
+              } else if (this.props.row == 'two') {
+                this.props.openJobHist();
+              }
+            }}>
+            <LinearLayout>
+              <CircularView>
+                <Icon name={this.props.firstName} size={26} color="#C85A23" />
+              </CircularView>
+              <Text>{this.props.firstLabel}</Text>
+            </LinearLayout>
+          </TouchableOpacity>
+          <VerticalView />
+          <TouchableOpacity
+            onPress={() => {
+              if (this.props.row == 'one') {
+                Alert.alert('Job Tracker');
+              } else if (this.props.row == 'two') {
+                Alert.alert('Support');
+              }
+            }}>
+            <LinearLayout>
+              <CircularView style={{elevation: 4}}>
+                <Icon name={this.props.secondName} size={23} color="#C85A23" />
+              </CircularView>
+              <Text>{this.props.secondLabel}</Text>
+            </LinearLayout>
+          </TouchableOpacity>
+        </Row>
+      </Container>
+    );
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(DoubleLayout);
 
 const Text = styled.Text`
   font-size: 15px;
   margin-top: 10px;
   color: rgba(44, 63, 112, 0.74);
+  font-family: Ionicons;
 `;
 
 const Row = styled.View`

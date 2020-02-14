@@ -118,6 +118,7 @@ const InputView = styled.View`
 const SubText = styled.Text`
   color: #2c3f70;
   margin: 10px 20px 10px 20px;
+  font-family: Ionicons;
 `;
 
 const Container = styled.View`
@@ -137,7 +138,9 @@ const LoginContainer = styled.View`
   align-items: center;
 `;
 
-const FgtPass = styled.Text``;
+const FgtPass = styled.Text`
+  font-family: Ionicons;
+`;
 
 const TipText = styled.Text`
   text-align: center;
@@ -146,6 +149,7 @@ const TipText = styled.Text`
   margin-top: 5px;
   line-height: 22px;
   color: #2c3f70;
+  font-family: Ionicons;
 `;
 
 const Text = styled.Text`
@@ -156,6 +160,7 @@ const Text = styled.Text`
   color: white;
   width: 300px;
   font-weight: 600;
+  font-family: Ionicons;
 `;
 
 const View = styled.View`
@@ -194,7 +199,7 @@ const Button = styled.View`
 
 const BtnText = styled.Text`
   color: white;
-  font-weight: 600;
   font-size: 17px;
   text-transform: uppercase;
+  font-family: Ionicons;
 `;
