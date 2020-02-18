@@ -18,6 +18,10 @@ class HomeScreen extends React.Component {
   componentDidUpdate() {
     if (this.props.action == 'openJobHist') {
       this.props.navigation.navigate('JobHist');
+    } else if (this.props.action == 'homeJobTracker') {
+      this.props.navigation.navigate('JST');
+    } else if (this.props.action == 'openWallet') {
+      this.props.navigation.navigate('Wallet');
     }
   }
 
@@ -34,23 +38,26 @@ class HomeScreen extends React.Component {
             <TouchableOpacity
               style={{
                 position: 'absolute',
+                elevation: 3,
+                padding: 5,
                 ...Platform.select({
                   ios: {right: 20, top: 35},
                   android: {right: 20, top: 15},
                 }),
               }}>
-              <Icon name="ios-settings" size={30} color="#ffffff" />
+              <Icon name="ios-settings" size={25} color="#ffffff" />
             </TouchableOpacity>
             <TouchableOpacity
               style={{
                 position: 'absolute',
                 elevation: 3,
+                padding: 5,
                 ...Platform.select({
                   ios: {right: 60, top: 35},
                   android: {right: 60, top: 15},
                 }),
               }}>
-              <Icon name="ios-notifications" size={30} color="#ffffff" />
+              <Icon name="ios-notifications" size={25} color="#ffffff" />
             </TouchableOpacity>
             <Row
               style={{
@@ -178,7 +185,7 @@ const Column = styled.View`
 const TopView = styled.View`
   height: 236px;
   width: 100%;
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.5);
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 `;
 
 const Text = styled.Text`

@@ -14,6 +14,14 @@ function mapDispatchToProps(dispatch) {
       dispatch({
         type: 'OPEN_JOB_HIST',
       }),
+    homeJobTracker: () =>
+      dispatch({
+        type: 'HOME_JOB_TRACKER',
+      }),
+    openWallet: () =>
+      dispatch({
+        type: 'OPEN_WALLET',
+      }),
   };
 }
 
@@ -25,7 +33,7 @@ class DoubleLayout extends React.Component {
           <TouchableOpacity
             onPress={() => {
               if (this.props.row == 'one') {
-                Alert.alert('Wallet');
+                this.props.openWallet();
               } else if (this.props.row == 'two') {
                 this.props.openJobHist();
               }
@@ -41,7 +49,7 @@ class DoubleLayout extends React.Component {
           <TouchableOpacity
             onPress={() => {
               if (this.props.row == 'one') {
-                Alert.alert('Job Tracker');
+                this.props.homeJobTracker();
               } else if (this.props.row == 'two') {
                 Alert.alert('Support');
               }

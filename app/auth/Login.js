@@ -7,6 +7,7 @@ class Login extends React.Component {
   static navigationOptions = {
     header: null,
   };
+
   state = {
     email: '',
     password: '',

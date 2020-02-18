@@ -6,6 +6,7 @@ import HomeScreen from '../screens/HomeScreen';
 import JobHistScreen from '../screens/JobHistScreen';
 import JobZoneScreen from '../screens/JobZoneScreen';
 import JSTScreen from '../screens/JSTScreen';
+import WalletScreen from '../screens/WalletScreen';
 
 const AppNavigator = createStackNavigator(
   {
@@ -15,6 +16,7 @@ const AppNavigator = createStackNavigator(
     JobHist: JobHistScreen,
     JobZone: JobZoneScreen,
     JST: JSTScreen,
+    Wallet: WalletScreen,
   },
   {
     initialRouteName: 'Login',

@@ -42,6 +42,10 @@ PODS:
   - GoogleMaps/Base (3.2.0)
   - GoogleMaps/Maps (3.2.0):
     - GoogleMaps/Base
+  - lottie-ios (2.5.3)
+  - lottie-react-native (2.5.11):
+    - lottie-ios
+    - React
   - Permission-LocationAlways (2.0.9):
     - RNPermissions
   - Permission-LocationWhenInUse (2.0.9):
@@ -277,6 +281,8 @@ DEPENDENCIES:
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
   - Google-Maps-iOS-Utils
   - GoogleMaps
+  - lottie-ios (from `../node_modules/lottie-ios`)
+  - lottie-react-native (from `../node_modules/lottie-react-native`)
   - Permission-LocationAlways (from `../node_modules/react-native-permissions/ios/LocationAlways.podspec`)
   - Permission-LocationWhenInUse (from `../node_modules/react-native-permissions/ios/LocationWhenInUse.podspec`)
   - RCTRequired (from `../node_modules/react-native/Libraries/RCTRequired`)
@@ -332,6 +338,10 @@ EXTERNAL SOURCES:
     :podspec: "../node_modules/react-native/third-party-podspecs/Folly.podspec"
   glog:
     :podspec: "../node_modules/react-native/third-party-podspecs/glog.podspec"
+  lottie-ios:
+    :path: "../node_modules/lottie-ios"
+  lottie-react-native:
+    :path: "../node_modules/lottie-react-native"
   Permission-LocationAlways:
     :path: "../node_modules/react-native-permissions/ios/LocationAlways.podspec"
   Permission-LocationWhenInUse:
@@ -407,6 +417,8 @@ SPEC CHECKSUMS:
   glog: 1f3da668190260b06b429bb211bfbee5cd790c28
   Google-Maps-iOS-Utils: c32891ff472eaaa1fca032beedafa1a013af7875
   GoogleMaps: 5046d7edfe381c1a0b20fdaf293915a375c3122b
+  lottie-ios: a50d5c0160425cd4b01b852bb9578963e6d92d31
+  lottie-react-native: 216bd1295fa67b159fdbe5562a7d7b6371da6422
   Permission-LocationAlways: f10e3c82c2cfa38137ba0a41e132630578a8018f
   Permission-LocationWhenInUse: f5dd8f5c9a0412db5eddd299ae208d6268b595b1
   RCTRequired: f3b3fb6f4723e8e52facb229d0c75fdc76773849

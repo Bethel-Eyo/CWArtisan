@@ -185,6 +185,7 @@ dependencies {
     implementation "com.facebook.react:react-native:+"  // From node_modules
     implementation project(':react-native-vector-icons')
     implementation project(':react-native-svg')
+    implementation project(':lottie-react-native')
     implementation 'com.android.support:multidex:1.0.3'
 
 
