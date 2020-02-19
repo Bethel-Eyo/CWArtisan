@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import {TouchableOpacity} from 'react-native';
+import {TouchableOpacity, StatusBar} from 'react-native';
 import {FloatingTitleTextInputField} from '../components/FloatingHintInput';
 
 class ResetPassword extends React.Component {
@@ -30,6 +30,7 @@ class ResetPassword extends React.Component {
   render() {
     return (
       <Container>
+        <StatusBar barStyle="light-content" backgroundColor="#AC5428" />
         <Img source={require('../assets/painter.jpg')}>
           <View style={{backgroundColor: 'rgba(25,0,0,0.6)'}}>
             <Logo

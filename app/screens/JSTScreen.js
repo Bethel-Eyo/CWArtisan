@@ -8,6 +8,9 @@ import {
   Animated,
   Dimensions,
   TouchableOpacity,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
 } from 'react-native';
 import {FloatingTitleTextInputField} from '../components/FloatingHintInput';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -36,9 +39,17 @@ function mapDispatchToProps(dispatch) {
       dispatch({
         type: 'UNDO_CONFIRM_DIAGNOSIS',
       }),
+    confirmJobDone: () =>
+      dispatch({
+        type: 'CONFIRM_JOB_DONE',
+      }),
     activateConfirmJobDone: () =>
       dispatch({
         type: 'ACTIVATE_CONFIRM_JOB_DONE',
+      }),
+    undoConfirmJobDone: () =>
+      dispatch({
+        type: 'UNDO_CONFIRM_JOB_DONE',
       }),
   };
 }
@@ -55,6 +66,8 @@ class JSTScreen extends React.Component {
   componentDidUpdate() {
     if (this.props.action == 'confirmArrival') {
       this.confirmArrival();
+    } else if (this.props.action == 'confirmJobDone') {
+      this.confirmJobCompletion();
     }
     this.configureComponent();
   }
@@ -94,7 +107,7 @@ class JSTScreen extends React.Component {
     firstTip: 'waiting for the user to confirm arrival',
     secondTip: 'waiting for user to confirm diagnosis',
     thirdTip: 'waiting for user to confirm job completion',
-    top: new Animated.Value(screenHeight),
+    top: new Animated.Value(screenHeight + 300),
     scale: new Animated.Value(1.3),
     translateY: new Animated.Value(0),
   };
@@ -119,7 +132,7 @@ class JSTScreen extends React.Component {
     ) {
       setTimeout(() => {
         Animated.timing(this.state.top, {
-          toValue: screenHeight,
+          toValue: screenHeight + 300,
           duration: 0,
         }).start();
 
@@ -127,7 +140,7 @@ class JSTScreen extends React.Component {
       }, 500);
 
       Animated.spring(this.state.translateY, {
-        toValue: 1000,
+        toValue: screenHeight,
         duration: 500,
       }).start();
     }
@@ -146,6 +159,28 @@ class JSTScreen extends React.Component {
         {
           text: 'Yes',
           onPress: () => this.setFirstPhase(),
+        },
+      ],
+      {
+        cancelable: false,
+      },
+    );
+    return true;
+  };
+
+  confirmJobCompletion = () => {
+    Alert.alert(
+      'Job Completion',
+      'Is your client satisfied with the Job?',
+      [
+        {
+          text: 'No',
+          onPress: () => this.props.undoConfirmJobDone(),
+          style: 'cancel',
+        },
+        {
+          text: 'Yes',
+          onPress: () => this.setThirdPhase(),
         },
       ],
       {
@@ -197,6 +232,22 @@ class JSTScreen extends React.Component {
     });
   };
 
+  setThirdPhase = () => {
+    this.props.activateConfirmJobDone();
+    this.setState({
+      thirdBorderColor: '#30D769',
+      thirdBtnColor: '#30D769',
+      thirdBtnText: 'confirmed',
+      thirdDisable: true,
+      thirdTextColor: '#30D769',
+      thirdTitleColor: '#30D769',
+      thirdValue: 'Completed',
+      thirdValueColor: '#30D769',
+      proceedDisable: false,
+      proceedColor: '#c85a23',
+    });
+  };
+
   componentWillUnmount() {
     BackHandler.removeEventListener(
       'hardwareBackPress',
@@ -210,105 +261,120 @@ class JSTScreen extends React.Component {
 
   render() {
     return (
-      <Container>
-        <JSTComponent
-          title="Arrival"
-          titleColor={this.state.firstTitleColor}
-          value={this.state.firstValue}
-          valueColor={this.state.firstValueColor}
-          text={this.state.firstText}
-          textColor={this.state.firstTextColor}
-          btnText={this.state.firstBtnText}
-          btnColor={this.state.firstBtnColor}
-          borderColor={this.state.firstBorderColor}
-          tip={this.state.firstTip}
-          disable={this.state.firstDisable}
-        />
-        <JSTComponent
-          title="Diagnosis"
-          titleColor={this.state.secondTitleColor}
-          value={this.state.secondValue}
-          valueColor={this.state.secondValueColor}
-          text={this.state.secondText}
-          textColor={this.state.secondTextColor}
-          btnText={this.state.secondBtnText}
-          btnColor={this.state.secondBtnColor}
-          borderColor={this.state.secondBorderColor}
-          tip={this.state.secondTip}
-          disable={this.state.secondDisable}
-        />
-        <JSTComponent
-          title="Job Completion"
-          titleColor={this.state.thirdTitleColor}
-          value={this.state.thirdValue}
-          valueColor={this.state.thirdValueColor}
-          text={this.state.thirdText}
-          textColor={this.state.thirdTextColor}
-          btnText={this.state.thirdBtnText}
-          btnColor={this.state.thirdBtnColor}
-          borderColor={this.state.thirdBorderColor}
-          tip={this.state.thirdTip}
-          disable={this.state.thirdDisable}
-        />
-        <AnimatedContainer
-          style={{
-            elevation: 7,
-            top: this.state.top,
-            transform: [
-              {scale: this.state.scale},
-              {translateY: this.state.translateY},
-            ],
-            backgroundColor: 'rgba(25,0,0,0.7)',
-          }}>
-          <Casing>
-            <Logo source={require('../assets/citiworks_logo.png')} />
-            <Title>Costing</Title>
-            <Tip>
-              Please enter the cost of materials and service charge for the
-              execution of the job.
-            </Tip>
-            <InputView>
-              <FloatingTitleTextInputField
-                attrName="costOfMaterials"
-                title="Cost of Materials"
-                value=""
-                updateIconState={() => {}}
-                updateBlurState={() => {}}
-                updateMasterState={this._updateMasterState}
-                otherTextInputProps={{
-                  autoCapitalize: 'none',
-                }}
-              />
-            </InputView>
-            <InputView>
-              <FloatingTitleTextInputField
-                attrName="password"
-                title="Service Charge"
-                value=""
-                updateIconState={() => {}}
-                updateBlurState={() => {}}
-                updateMasterState={this._updateMasterState}
-                otherTextInputProps={{
-                  autoCapitalize: 'none',
-                }}
-              />
-            </InputView>
-            <TouchableOpacity onPress={this.setSecondPhase}>
-              <Button>
+      <SafeAreaView style={{flex: 1}}>
+        <StatusBar barStyle="light-content" backgroundColor="#AC5428" />
+        <ScrollView style={{height: '100%'}}>
+          <Container>
+            <JSTComponent
+              title="Arrival"
+              titleColor={this.state.firstTitleColor}
+              value={this.state.firstValue}
+              valueColor={this.state.firstValueColor}
+              text={this.state.firstText}
+              textColor={this.state.firstTextColor}
+              btnText={this.state.firstBtnText}
+              btnColor={this.state.firstBtnColor}
+              borderColor={this.state.firstBorderColor}
+              tip={this.state.firstTip}
+              disable={this.state.firstDisable}
+            />
+            <JSTComponent
+              title="Diagnosis"
+              titleColor={this.state.secondTitleColor}
+              value={this.state.secondValue}
+              valueColor={this.state.secondValueColor}
+              text={this.state.secondText}
+              textColor={this.state.secondTextColor}
+              btnText={this.state.secondBtnText}
+              btnColor={this.state.secondBtnColor}
+              borderColor={this.state.secondBorderColor}
+              tip={this.state.secondTip}
+              disable={this.state.secondDisable}
+            />
+            <JSTComponent
+              title="Job Completion"
+              titleColor={this.state.thirdTitleColor}
+              value={this.state.thirdValue}
+              valueColor={this.state.thirdValueColor}
+              text={this.state.thirdText}
+              textColor={this.state.thirdTextColor}
+              btnText={this.state.thirdBtnText}
+              btnColor={this.state.thirdBtnColor}
+              borderColor={this.state.thirdBorderColor}
+              tip={this.state.thirdTip}
+              disable={this.state.thirdDisable}
+            />
+            <TouchableOpacity
+              disable={this.state.disable}
+              onPress={() => {
+                this.props.navigation.navigate('Done');
+              }}
+              style={{marginTop: 30}}>
+              <Button style={{backgroundColor: this.state.proceedColor}}>
                 <BtnText>Next</BtnText>
               </Button>
             </TouchableOpacity>
-          </Casing>
-          <TouchableOpacity
-            onPress={() => {
-              this.props.undoConfirmDiagnosis();
-            }}>
-            <CloseButton style={{elevation: 20}}>
-              <Icon name="ios-close" size={44} color="#546bfb" />
-            </CloseButton>
-          </TouchableOpacity>
-        </AnimatedContainer>
-      </Container>
+            <AnimatedContainer
+              style={{
+                elevation: 7,
+                top: this.state.top,
+                transform: [
+                  {scale: this.state.scale},
+                  {translateY: this.state.translateY},
+                ],
+                backgroundColor: 'rgba(25,0,0,0.7)',
+              }}>
+              <Casing>
+                <Logo source={require('../assets/citiworks_logo.png')} />
+                <Title>Costing</Title>
+                <Tip>
+                  Please enter the cost of materials and service charge for the
+                  execution of the job.
+                </Tip>
+                <InputView>
+                  <FloatingTitleTextInputField
+                    attrName="costOfMaterials"
+                    title="Cost of Materials"
+                    value=""
+                    updateIconState={() => {}}
+                    updateBlurState={() => {}}
+                    updateMasterState={this._updateMasterState}
+                    otherTextInputProps={{
+                      autoCapitalize: 'none',
+                    }}
+                  />
+                </InputView>
+                <InputView>
+                  <FloatingTitleTextInputField
+                    attrName="password"
+                    title="Service Charge"
+                    value=""
+                    updateIconState={() => {}}
+                    updateBlurState={() => {}}
+                    updateMasterState={this._updateMasterState}
+                    otherTextInputProps={{
+                      autoCapitalize: 'none',
+                    }}
+                  />
+                </InputView>
+                <TouchableOpacity onPress={this.setSecondPhase}>
+                  <Button>
+                    <BtnText>Next</BtnText>
+                  </Button>
+                </TouchableOpacity>
+              </Casing>
+              <TouchableOpacity
+                onPress={() => {
+                  this.props.undoConfirmDiagnosis();
+                }}>
+                <CloseButton style={{elevation: 20}}>
+                  <Icon name="ios-close" size={44} color="#546bfb" />
+                </CloseButton>
+              </TouchableOpacity>
+            </AnimatedContainer>
+          </Container>
+        </ScrollView>
+      </SafeAreaView>
     );
   }
 }
@@ -317,7 +383,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(JSTScreen);
 
 const Container = styled.View`
   align-items: center;
-  flex: 1;
+  height: 100%;
 `;
 
 const Casing = styled.View`

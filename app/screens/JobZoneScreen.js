@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import {Platform, Alert} from 'react-native';
+import {Platform, Alert, StatusBar} from 'react-native';
 import MapView, {PROVIDER_GOOGLE, Marker, Callout} from 'react-native-maps';
 import Geolocation from '@react-native-community/geolocation';
 import {request, PERMISSIONS} from 'react-native-permissions';
@@ -77,6 +77,7 @@ class JobZoneScreen extends React.Component {
   render() {
     return (
       <Container>
+        <StatusBar barStyle="light-content" backgroundColor="#AC5428" />
         <MapView
           provider={PROVIDER_GOOGLE}
           ref={map => (this._map = map)}

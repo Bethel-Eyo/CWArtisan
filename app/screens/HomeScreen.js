@@ -3,11 +3,22 @@ import styled from 'styled-components';
 import LinearGradient from 'react-native-linear-gradient';
 import DoubleLayout from '../components/DoubleLayout';
 import Icon from 'react-native-vector-icons/Ionicons';
-import {TouchableOpacity, Platform, Alert} from 'react-native';
+import {TouchableOpacity, Platform, Alert, StatusBar} from 'react-native';
 import {connect} from 'react-redux';
+import NotificationButton from '../components/NotificationButton';
+import Notifications from '../components/Notifications';
 
 function mapStateToProps(state) {
   return {action: state.action};
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    openNotif: () =>
+      dispatch({
+        type: 'OPEN_NOTIF',
+      }),
+  };
 }
 
 class HomeScreen extends React.Component {
@@ -22,12 +33,16 @@ class HomeScreen extends React.Component {
       this.props.navigation.navigate('JST');
     } else if (this.props.action == 'openWallet') {
       this.props.navigation.navigate('Wallet');
+    } else if (this.props.action == 'openSupport') {
+      this.props.navigation.navigate('Support');
     }
   }
 
   render() {
     return (
       <Container>
+        <StatusBar barStyle="light-content" backgroundColor="#AC5428" />
+        <Notifications />
         <LinearGradient
           colors={['rgba(200, 90, 35, 0.9)', 'rgba(240, 26, 65, 0.72)']}
           style={{
@@ -36,35 +51,43 @@ class HomeScreen extends React.Component {
           }}>
           <TopView>
             <TouchableOpacity
+              onPress={() => {
+                this.props.navigation.navigate('Settings');
+              }}
               style={{
                 position: 'absolute',
-                elevation: 3,
                 padding: 5,
                 ...Platform.select({
-                  ios: {right: 20, top: 35},
+                  ios: {right: 20, top: 40},
                   android: {right: 20, top: 15},
                 }),
               }}>
-              <Icon name="ios-settings" size={25} color="#ffffff" />
+              <Icon
+                style={{elevation: 4}}
+                name="ios-settings"
+                size={30}
+                color="#ffffff"
+              />
             </TouchableOpacity>
             <TouchableOpacity
+              onPress={this.props.openNotif}
               style={{
                 position: 'absolute',
                 elevation: 3,
                 padding: 5,
                 ...Platform.select({
-                  ios: {right: 60, top: 35},
+                  ios: {right: 60, top: 32},
                   android: {right: 60, top: 15},
                 }),
               }}>
-              <Icon name="ios-notifications" size={25} color="#ffffff" />
+              <NotificationButton />
             </TouchableOpacity>
             <Row
               style={{
                 elevation: 3,
                 ...Platform.select({
                   ios: {marginLeft: '10%', marginTop: '15%'},
-                  android: {marginLeft: '10%', marginTop: '9%'},
+                  android: {marginLeft: '10%', marginTop: '11%'},
                 }),
               }}>
               <Dp source={require('../assets/carpenter.jpg')} />
@@ -117,7 +140,7 @@ class HomeScreen extends React.Component {
   }
 }
 
-export default connect(mapStateToProps)(HomeScreen);
+export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen);
 
 const Circle = styled.View`
   height: 14px;

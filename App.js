@@ -9,6 +9,10 @@ const initialState = {
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
+    case 'OPEN_NOTIF':
+      return {...state, action: 'openNotif'};
+    case 'CLOSE_NOTIF':
+      return {...state, action: 'closeNotif'};
     case 'HOME_MODE':
       return {...state, action: 'homeMode'};
     case 'OPEN_JOB_HIST':
@@ -19,6 +23,8 @@ const reducer = (state = initialState, action) => {
       return {...state, action: 'homeJobTracker'};
     case 'OPEN_WALLET':
       return {...state, action: 'openWallet'};
+    case 'OPEN_SUPPORT':
+      return {...state, action: 'openSupport'};
     case 'CONFIRM_ARRIVAL':
       return {...state, action: 'confirmArrival'};
     case 'UNDO_CONFIRM_ARRIVAL':

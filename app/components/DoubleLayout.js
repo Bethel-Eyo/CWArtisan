@@ -22,13 +22,17 @@ function mapDispatchToProps(dispatch) {
       dispatch({
         type: 'OPEN_WALLET',
       }),
+    openSupport: () =>
+      dispatch({
+        type: 'OPEN_SUPPORT',
+      }),
   };
 }
 
 class DoubleLayout extends React.Component {
   render() {
     return (
-      <Container style={{elevation: 4}}>
+      <Container style={{elevation: 2}}>
         <Row>
           <TouchableOpacity
             onPress={() => {
@@ -51,7 +55,7 @@ class DoubleLayout extends React.Component {
               if (this.props.row == 'one') {
                 this.props.homeJobTracker();
               } else if (this.props.row == 'two') {
-                Alert.alert('Support');
+                this.props.openSupport();
               }
             }}>
             <LinearLayout>

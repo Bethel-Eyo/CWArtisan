@@ -43,7 +43,7 @@ PODS:
   - GoogleMaps/Maps (3.2.0):
     - GoogleMaps/Base
   - lottie-ios (2.5.3)
-  - lottie-react-native (2.5.11):
+  - lottie-react-native (2.6.0):
     - lottie-ios
     - React
   - Permission-LocationAlways (2.0.9):
@@ -418,7 +418,7 @@ SPEC CHECKSUMS:
   Google-Maps-iOS-Utils: c32891ff472eaaa1fca032beedafa1a013af7875
   GoogleMaps: 5046d7edfe381c1a0b20fdaf293915a375c3122b
   lottie-ios: a50d5c0160425cd4b01b852bb9578963e6d92d31
-  lottie-react-native: 216bd1295fa67b159fdbe5562a7d7b6371da6422
+  lottie-react-native: 05b6e2dd502d7a91ff128036c4f0984363e5eb4a
   Permission-LocationAlways: f10e3c82c2cfa38137ba0a41e132630578a8018f
   Permission-LocationWhenInUse: f5dd8f5c9a0412db5eddd299ae208d6268b595b1
   RCTRequired: f3b3fb6f4723e8e52facb229d0c75fdc76773849

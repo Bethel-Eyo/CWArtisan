@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import {BackHandler, TouchableOpacity, Platform} from 'react-native';
+import {BackHandler, TouchableOpacity, Platform, StatusBar} from 'react-native';
 import {FloatingTitleTextInputField} from '../components/FloatingHintInput';
 
 class Login extends React.Component {
@@ -77,6 +77,7 @@ class Login extends React.Component {
   render() {
     return (
       <Container>
+        <StatusBar barStyle="light-content" backgroundColor="#AC5428" />
         <Img source={require('../assets/painter.jpg')}>
           <View style={{backgroundColor: 'rgba(25,0,0,0.6)'}}>
             <Logo
