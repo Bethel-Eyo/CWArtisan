@@ -85,6 +85,7 @@ class Notifications extends React.Component {
             left: '50%',
             marginLeft: -22,
             zIndex: 100,
+            elevation: 5,
           }}>
           <CloseButton style={{elevation: 20}}>
             <Icon name="ios-close" size={44} color="#546bfb" />

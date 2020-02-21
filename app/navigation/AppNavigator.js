@@ -12,6 +12,7 @@ import FAQScreen from '../screens/FAQScreen';
 import TransactScreen from '../screens/NewJobHistScreen';
 import ChangePasScreen from '../screens/ChangePasScreen';
 import SettingsScreen from '../screens/SettingsScreen';
+import JobDetailScreen from '../screens/JobDetailScreen';
 
 const AppNavigator = createStackNavigator(
   {
@@ -27,6 +28,7 @@ const AppNavigator = createStackNavigator(
     FAQ: FAQScreen,
     ChangePassword: ChangePasScreen,
     Settings: SettingsScreen,
+    JobDetail: JobDetailScreen,
   },
   {
     initialRouteName: 'Login',

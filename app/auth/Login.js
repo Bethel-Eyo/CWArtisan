@@ -152,13 +152,9 @@ class Login extends React.Component {
             </FgtPass>
           </TouchableOpacity>
         </LoginContainer>
-        <TipText>
-          Don’t have an Artisan account? Find out how to become a CItiworks
-          Artisan by clicking below
-        </TipText>
-        <Button style={{elevation: 6, width: 150, height: 37}}>
-          <BtnText style={{fontSize: 14}}>Click me!</BtnText>
-        </Button>
+        <TouchableOpacity>
+          <TipText>How to become an Artisan</TipText>
+        </TouchableOpacity>
       </Container>
     );
   }
@@ -204,9 +200,9 @@ const TipText = styled.Text`
   text-align: center;
   font-size: 17px;
   width: 300px;
-  margin-top: 5px;
+  margin-top: 15px;
   line-height: 22px;
-  color: #2c3f70;
+  color: #f24505;
   font-family: Ionicons;
 `;
 

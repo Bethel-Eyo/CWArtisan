@@ -56,7 +56,11 @@ class TransactScreen extends React.Component {
                 <View key={index}>
                   <Date>{time.date}</Date>
                   {time.transaction.map((job, position) => (
-                    <TouchableOpacity key={position}>
+                    <TouchableOpacity
+                      key={position}
+                      onPress={() => {
+                        this.props.navigation.navigate('JobDetail');
+                      }}>
                       <View>
                         <TransactComp
                           title={job.jobTitle}

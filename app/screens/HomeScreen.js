@@ -3,7 +3,12 @@ import styled from 'styled-components';
 import LinearGradient from 'react-native-linear-gradient';
 import DoubleLayout from '../components/DoubleLayout';
 import Icon from 'react-native-vector-icons/Ionicons';
-import {TouchableOpacity, Platform, Alert, StatusBar} from 'react-native';
+import {
+  TouchableOpacity,
+  Platform,
+  ImageBackground,
+  StatusBar,
+} from 'react-native';
 import {connect} from 'react-redux';
 import NotificationButton from '../components/NotificationButton';
 import Notifications from '../components/Notifications';
@@ -42,33 +47,19 @@ class HomeScreen extends React.Component {
     return (
       <Container>
         <StatusBar barStyle="light-content" backgroundColor="#AC5428" />
-        <Notifications />
-        <LinearGradient
+
+        {/* <LinearGradient
           colors={['rgba(200, 90, 35, 0.9)', 'rgba(240, 26, 65, 0.72)']}
           style={{
             borderBottomLeftRadius: 30,
             borderBottomRightRadius: 30,
+          }}> */}
+        <ImageBackground
+          source={require('../assets/citi_bg.jpg')}
+          style={{
+            width: '100%',
           }}>
-          <TopView>
-            <TouchableOpacity
-              onPress={() => {
-                this.props.navigation.navigate('Settings');
-              }}
-              style={{
-                position: 'absolute',
-                padding: 5,
-                ...Platform.select({
-                  ios: {right: 20, top: 40},
-                  android: {right: 20, top: 15},
-                }),
-              }}>
-              <Icon
-                style={{elevation: 4}}
-                name="ios-settings"
-                size={30}
-                color="#ffffff"
-              />
-            </TouchableOpacity>
+          <TopView style={{backgroundColor: 'rgba(25,0,0,0.6)'}}>
             <TouchableOpacity
               onPress={this.props.openNotif}
               style={{
@@ -76,8 +67,8 @@ class HomeScreen extends React.Component {
                 elevation: 3,
                 padding: 5,
                 ...Platform.select({
-                  ios: {right: 60, top: 32},
-                  android: {right: 60, top: 15},
+                  ios: {right: 20, top: 32},
+                  android: {right: 20, top: 15},
                 }),
               }}>
               <NotificationButton />
@@ -90,7 +81,12 @@ class HomeScreen extends React.Component {
                   android: {marginLeft: '10%', marginTop: '11%'},
                 }),
               }}>
-              <Dp source={require('../assets/carpenter.jpg')} />
+              <TouchableOpacity
+                onPress={() => {
+                  this.props.navigation.navigate('Settings');
+                }}>
+                <Dp source={require('../assets/carpenter.jpg')} />
+              </TouchableOpacity>
               <Column>
                 <Name>Idris Elba</Name>
                 <Category>Carpenter</Category>
@@ -105,7 +101,7 @@ class HomeScreen extends React.Component {
             <Circle />
             <Text>Available</Text>
           </SubRow>
-        </LinearGradient>
+        </ImageBackground>
         <View>
           <DoubleLayout
             nav={this.props.navigation}
@@ -135,6 +131,7 @@ class HomeScreen extends React.Component {
             </CircularView>
           </TouchableOpacity>
         </ThirdView>
+        <Notifications />
       </Container>
     );
   }
