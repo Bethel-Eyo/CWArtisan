@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import {Platform, Alert, StatusBar} from 'react-native';
+import {Platform, Alert, StatusBar, Animated} from 'react-native';
 import MapView, {PROVIDER_GOOGLE, Marker, Callout} from 'react-native-maps';
 import Geolocation from '@react-native-community/geolocation';
 import {request, PERMISSIONS} from 'react-native-permissions';
@@ -9,6 +9,19 @@ import {connect} from 'react-redux';
 
 function mapStateToProps(state) {
   return {action: state.action};
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    openRequest: () =>
+      dispatch({
+        type: 'OPEN_REQUEST',
+      }),
+    closeRequest: () =>
+      dispatch({
+        type: 'CLOSE_REQUEST',
+      }),
+  };
 }
 
 class JobZoneScreen extends React.Component {
@@ -23,16 +36,37 @@ class JobZoneScreen extends React.Component {
       latitudeDelta: 0.001,
       longitudeDelta: 0.001,
     },
+    opacity: new Animated.Value(1),
+  };
+
+  showRequest = () => {
+    if (this.props.action == 'openRequest') {
+      Animated.spring(this.state.opacity, {
+        toValue: 0.5,
+      }).start();
+    }
+
+    if (this.props.action == 'closeRequest') {
+      Animated.spring(this.state.opacity, {
+        toValue: 1,
+      }).start();
+    }
   };
 
   componentDidUpdate() {
     if (this.props.action == 'openJobTracker') {
       this.props.navigation.navigate('JST');
     }
+    this.showRequest();
   }
 
   componentDidMount() {
     this.requestLocationPermission();
+    setTimeout(() => {
+      //Alert.alert('set has timed out');
+      this.props.openRequest();
+    }, 5000);
+    this.showRequest();
   }
 
   requestLocationPermission = async () => {
@@ -78,35 +112,33 @@ class JobZoneScreen extends React.Component {
     return (
       <Container>
         <StatusBar barStyle="light-content" backgroundColor="#AC5428" />
-        <MapView
-          provider={PROVIDER_GOOGLE}
-          ref={map => (this._map = map)}
-          showsUserLocation={true}
-          style={{height: '100%'}}
-          initialRegion={this.state.initialPosition}>
-          <Marker coordinate={{latitude: 37.78825, longitude: -122.4324}}>
-            <Callout>
-              <Text>Hello Sanfrancisco</Text>
-            </Callout>
-          </Marker>
-        </MapView>
-        <View>
-          <JobNotifComp />
-        </View>
+        <AnimatedContainer style={{opacity: this.state.opacity}}>
+          <MapView
+            provider={PROVIDER_GOOGLE}
+            ref={map => (this._map = map)}
+            showsUserLocation={true}
+            style={{height: '100%'}}
+            initialRegion={this.state.initialPosition}>
+            <Marker coordinate={{latitude: 37.78825, longitude: -122.4324}}>
+              <Callout>
+                <Text>Hello Sanfrancisco</Text>
+              </Callout>
+            </Marker>
+          </MapView>
+        </AnimatedContainer>
+
+        <JobNotifComp />
       </Container>
     );
   }
 }
 
-export default connect(mapStateToProps)(JobZoneScreen);
+export default connect(mapStateToProps, mapDispatchToProps)(JobZoneScreen);
 
 const Container = styled.View``;
 
-const View = styled.View`
-  position: absolute;
-  bottom: 20px
-  width: 100%;
-  align-items: center;
-`;
+const Casing = styled.View``;
+
+const AnimatedContainer = Animated.createAnimatedComponent(Container);
 
 const Text = styled.Text``;

@@ -41,6 +41,10 @@ const reducer = (state = initialState, action) => {
       return {...state, action: 'confirmJobDone'};
     case 'UNDO_CONFIRM_JOB_DONE':
       return {...state, action: 'undoConfirmJobDone'};
+    case 'OPEN_REQUEST':
+      return {...state, action: 'openRequest'};
+    case 'CLOSE_REQUEST':
+      return {...state, action: 'closeRequest'};
     default:
       return state;
   }
