@@ -5,9 +5,13 @@ import {
   StatusBar,
   ScrollView,
   BackHandler,
+  AsyncStorage,
+  Alert,
 } from 'react-native';
 import TransactComp from '../components/TransactComp';
 import {connect} from 'react-redux';
+import axios from 'axios';
+import Domain from '../constants/Domain';
 
 function mapStateToProps(state) {
   return {action: state.action};
@@ -23,6 +27,10 @@ function mapDispatchToProps(dispatch) {
 }
 
 class WalletScreen extends React.Component {
+  state = {
+    transactions: [],
+  };
+
   static navigationOptions = {
     title: 'Wallet',
     headerStyle: {
@@ -32,6 +40,42 @@ class WalletScreen extends React.Component {
     headerTitleStyle: {
       fontWeight: 'bold',
     },
+  };
+
+  componentDidMount() {
+    this.getArtisanTransactions();
+  }
+
+  getArtisanTransactions = async () => {
+    try {
+      const value = await AsyncStorage.getItem('artisanToken');
+      if (value !== null) {
+        const headers = {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + value,
+        };
+
+        const id = await AsyncStorage.getItem('artisanId');
+
+        axios
+          .get(Domain + 'api/artisans/artisan-transactions/' + id, {
+            headers: headers,
+          })
+          .then(response => {
+            Alert.alert('success');
+            this.setState({
+              transactions: response.data.transactions,
+            });
+          })
+          .catch(error => {
+            this.setState({isLoading: false});
+            Alert.alert('An error occured! ' + error.message);
+          });
+      }
+    } catch (error) {
+      // Error retrieving data
+      Alert.alert(error);
+    }
   };
 
   componentWillUnmount() {
@@ -69,7 +113,7 @@ class WalletScreen extends React.Component {
         <ScrollView>
           <SubTitle>Transaction History</SubTitle>
           <OuterView>
-            {history.map((time, index) => (
+            {/* {history.map((time, index) => (
               <View key={index}>
                 <Date>{time.date}</Date>
                 {time.transaction.map((job, position) => (
@@ -84,6 +128,17 @@ class WalletScreen extends React.Component {
                     </View>
                   </TouchableOpacity>
                 ))}
+              </View>
+            ))} */}
+
+            {this.state.transactions.map((transaction, index) => (
+              <View key={index}>
+                <Date>{transaction.created_at}</Date>
+                <TransactComp
+                  title={transaction.description}
+                  category="Cleaning"
+                  cost={transaction.amount}
+                />
               </View>
             ))}
           </OuterView>

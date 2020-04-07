@@ -1,7 +1,18 @@
 import React from 'react';
 import styled from 'styled-components';
-import {BackHandler, TouchableOpacity, Platform, StatusBar} from 'react-native';
+import {
+  BackHandler,
+  TouchableOpacity,
+  Platform,
+  StatusBar,
+  AsyncStorage,
+  Alert,
+} from 'react-native';
 import {FloatingTitleTextInputField} from '../components/FloatingHintInput';
+import Loading from '../lotties/Loading';
+import Success from '../lotties/Success';
+import axios from 'axios';
+import Domain from '../constants/Domain';
 
 class Login extends React.Component {
   static navigationOptions = {
@@ -13,6 +24,9 @@ class Login extends React.Component {
     password: '',
     iconEmail: require('../assets/icon-email.png'),
     iconPassword: require('../assets/icon-password.png'),
+    isLoading: false,
+    isSuccessful: false,
+    popState: true,
   };
 
   _updateMasterState = (attrName, value) => {
@@ -25,6 +39,41 @@ class Login extends React.Component {
       this.handleBackClicked(),
     );
   }
+
+  cwArtisanLogin = () => {
+    let auth = {
+      email: this.state.email,
+      password: this.state.password,
+    };
+    this.setState({isLoading: true});
+    axios
+      .post(Domain + 'api/artisan-login', auth)
+      .then(response => {
+        this.setState({isLoading: false});
+        this.setState({isSuccessful: true});
+        let userToken = response.data.token;
+        this.storeUserToken(userToken);
+        setTimeout(() => {
+          setTimeout(() => {
+            this.setState({isSuccessful: false});
+          }, 1000);
+        }, 2000);
+        this.setState({popState: false});
+        this.props.navigation.navigate('Home');
+      })
+      .catch(error => {
+        this.setState({isLoading: false});
+        Alert.alert('An error occured! ' + error.message);
+      });
+  };
+
+  storeUserToken = async token => {
+    try {
+      await AsyncStorage.setItem('artisanToken', token);
+    } catch (error) {
+      Alert.alert(error);
+    }
+  };
 
   componentDidMount() {
     BackHandler.addEventListener('hardwareBackPress', this.handleBackClicked);
@@ -129,10 +178,7 @@ class Login extends React.Component {
               }}
             />
           </InputView>
-          <TouchableOpacity
-            onPress={() => {
-              this.props.navigation.navigate('Home');
-            }}>
+          <TouchableOpacity onPress={this.cwArtisanLogin}>
             <Button style={{elevation: 6}}>
               <BtnText>Login</BtnText>
             </Button>
@@ -155,6 +201,8 @@ class Login extends React.Component {
         <TouchableOpacity>
           <TipText>How to become an Artisan</TipText>
         </TouchableOpacity>
+        <Loading isActive={this.state.isLoading} />
+        <Success isActive={this.state.isSuccessful} />
       </Container>
     );
   }

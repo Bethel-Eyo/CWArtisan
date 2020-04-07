@@ -7,20 +7,64 @@ import {
   Linking,
   StatusBar,
   ImageBackground,
+  AsyncStorage,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import axios from 'axios';
+import Domain from '../constants/Domain';
 
 class SettingsScreen extends React.Component {
   state = {
-    name: 'Bethel Eyo',
-    email: 'betheleyo@gmail.com',
-    phoneNumber: '+2347067035331',
+    name: '',
+    email: '',
+    phoneNumber: '',
+    category: '',
     photo:
       'https://raw.githubusercontent.com/Bethel-Eyo/FunUiCodes/master/assets/avatar-default.jpg',
   };
 
   static navigationOptions = {
     header: null,
+  };
+
+  componentDidMount() {
+    this.getArtisanProfile();
+  }
+
+  getArtisanProfile = async () => {
+    try {
+      const value = await AsyncStorage.getItem('artisanToken');
+      if (value !== null) {
+        const headers = {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + value,
+        };
+
+        axios
+          .get(Domain + 'api/artisans/artisan-profile', {
+            headers: headers,
+          })
+          .then(response => {
+            this.setState({
+              name:
+                response.data[0].artisan.first_name +
+                ' ' +
+                response.data[0].artisan.last_name,
+              email: response.data[0].artisan.email,
+              phoneNumber: response.data[0].phone_number,
+              category: response.data[0].category,
+              photo: response.data[0].profile_picture,
+            });
+          })
+          .catch(error => {
+            this.setState({isLoading: false});
+            Alert.alert('An error occured! ' + error.message);
+          });
+      }
+    } catch (error) {
+      // Error retrieving data
+      Alert.alert(error);
+    }
   };
 
   render() {
@@ -39,21 +83,21 @@ class SettingsScreen extends React.Component {
                 width: '100%',
                 alignItems: 'center',
               }}>
-              <ProfilePicture source={require('../assets/carpenter.jpg')} />
-              <Name>Idris Elba</Name>
+              <ProfilePicture source={{uri: this.state.photo}} />
+              <Name>{this.state.name}</Name>
               <Row style={{height: 30}}>
                 <Hint style={{color: '#C8D0E8', fontSize: 14}}>Craft:</Hint>
-                <Values>Furniture Engineer</Values>
+                <Values>{this.state.category}</Values>
               </Row>
               <Row style={{height: 30}}>
                 <Hint style={{color: '#C8D0E8', fontSize: 14}}>Email:</Hint>
-                <Values>idriselba49@gmail.com</Values>
+                <Values>{this.state.email}</Values>
               </Row>
               <Row style={{height: 30}}>
                 <Hint style={{color: '#C8D0E8', fontSize: 14}}>
                   Phone Number:
                 </Hint>
-                <Values>+2347098767889</Values>
+                <Values>{this.state.phoneNumber}</Values>
               </Row>
             </TopView>
           </ImageBackground>

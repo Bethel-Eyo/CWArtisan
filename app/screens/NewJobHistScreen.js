@@ -6,9 +6,13 @@ import {
   ScrollView,
   TouchableOpacity,
   BackHandler,
+  AsyncStorage,
+  Alert,
 } from 'react-native';
 import TransactComp from '../components/TransactComp';
 import {connect} from 'react-redux';
+import axios from 'axios';
+import Domain from '../constants/Domain';
 
 function mapStateToProps(state) {
   return {action: state.action};
@@ -24,12 +28,52 @@ function mapDispatchToProps(dispatch) {
 }
 
 class TransactScreen extends React.Component {
+  state = {
+    jobs: [],
+  };
+
+  componentDidMount() {
+    this.getArtisanJobs();
+  }
+
   componentWillUnmount() {
     BackHandler.removeEventListener(
       'hardwareBackPress',
       this.handleBackClicked(),
     );
   }
+
+  getArtisanJobs = async () => {
+    try {
+      const value = await AsyncStorage.getItem('artisanToken');
+      if (value !== null) {
+        const headers = {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + value,
+        };
+
+        const id = await AsyncStorage.getItem('artisanId');
+
+        axios
+          .get(Domain + 'api/artisans/artisan-jobs/' + id, {
+            headers: headers,
+          })
+          .then(response => {
+            Alert.alert('success');
+            this.setState({
+              jobs: response.data.jobs,
+            });
+          })
+          .catch(error => {
+            this.setState({isLoading: false});
+            Alert.alert('An error occured! ' + error.message);
+          });
+      }
+    } catch (error) {
+      // Error retrieving data
+      Alert.alert(error);
+    }
+  };
 
   handleBackClicked = () => {
     this.props.homeMode();
@@ -52,7 +96,7 @@ class TransactScreen extends React.Component {
         <SafeAreaView>
           <ScrollView style={{backgroundColor: '#e7ebf4'}}>
             <OuterView>
-              {history.map((time, index) => (
+              {/* {history.map((time, index) => (
                 <View key={index}>
                   <Date>{time.date}</Date>
                   {time.transaction.map((job, position) => (
@@ -71,6 +115,17 @@ class TransactScreen extends React.Component {
                       </View>
                     </TouchableOpacity>
                   ))}
+                </View>
+              ))} */}
+
+              {this.state.jobs.map((job, index) => (
+                <View key={index}>
+                  <Date>{job.created_at}</Date>
+                  <TransactComp
+                    title={job.job_title}
+                    category={job.category}
+                    cost={job.net_income}
+                  />
                 </View>
               ))}
             </OuterView>

@@ -8,10 +8,14 @@ import {
   Platform,
   ImageBackground,
   StatusBar,
+  Alert,
+  AsyncStorage,
 } from 'react-native';
 import {connect} from 'react-redux';
 import NotificationButton from '../components/NotificationButton';
 import Notifications from '../components/Notifications';
+import axios from 'axios';
+import Domain from '../constants/Domain';
 
 function mapStateToProps(state) {
   return {action: state.action};
@@ -27,9 +31,19 @@ function mapDispatchToProps(dispatch) {
 }
 
 class HomeScreen extends React.Component {
+  state = {
+    photo:
+      'https://raw.githubusercontent.com/Bethel-Eyo/FunUiCodes/master/assets/avatar-default.jpg',
+    category: '',
+    name: '',
+  };
   static navigationOptions = {
     header: null,
   };
+
+  componentDidMount() {
+    this.getArtisanProfile();
+  }
 
   componentDidUpdate() {
     if (this.props.action == 'openJobHist') {
@@ -42,6 +56,49 @@ class HomeScreen extends React.Component {
       this.props.navigation.navigate('Support');
     }
   }
+
+  getArtisanProfile = async () => {
+    try {
+      const value = await AsyncStorage.getItem('artisanToken');
+      if (value !== null) {
+        const headers = {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + value,
+        };
+
+        axios
+          .get(Domain + 'api/artisans/artisan-profile', {
+            headers: headers,
+          })
+          .then(response => {
+            this.setState({
+              name:
+                response.data[0].artisan.first_name +
+                ' ' +
+                response.data[0].artisan.last_name,
+              category: response.data[0].category,
+              photo: response.data[0].profile_picture,
+            });
+            this.storeUserId(response.data[0].artisan_id);
+          })
+          .catch(error => {
+            this.setState({isLoading: false});
+            Alert.alert('An error occured! ' + error.message);
+          });
+      }
+    } catch (error) {
+      // Error retrieving data
+      Alert.alert(error);
+    }
+  };
+
+  storeUserId = async id => {
+    try {
+      await AsyncStorage.setItem('artisanId', id);
+    } catch (error) {
+      Alert.alert(error);
+    }
+  };
 
   render() {
     return (
@@ -85,11 +142,11 @@ class HomeScreen extends React.Component {
                 onPress={() => {
                   this.props.navigation.navigate('Settings');
                 }}>
-                <Dp source={require('../assets/carpenter.jpg')} />
+                <Dp source={{uri: this.state.photo}} />
               </TouchableOpacity>
               <Column>
-                <Name>Idris Elba</Name>
-                <Category>Carpenter</Category>
+                <Name>{this.state.name}</Name>
+                <Category>{this.state.category}</Category>
               </Column>
             </Row>
           </TopView>
