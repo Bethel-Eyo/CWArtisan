@@ -52,7 +52,9 @@ class Login extends React.Component {
         this.setState({isLoading: false});
         this.setState({isSuccessful: true});
         let userToken = response.data.token;
+        let userID = response.data.user.id;
         this.storeUserToken(userToken);
+        this.storeUserId(userID);
         setTimeout(() => {
           setTimeout(() => {
             this.setState({isSuccessful: false});
@@ -70,6 +72,14 @@ class Login extends React.Component {
   storeUserToken = async token => {
     try {
       await AsyncStorage.setItem('artisanToken', token);
+    } catch (error) {
+      Alert.alert(error);
+    }
+  };
+
+  storeUserId = async id => {
+    try {
+      await AsyncStorage.setItem('userId', id);
     } catch (error) {
       Alert.alert(error);
     }

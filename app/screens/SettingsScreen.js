@@ -34,6 +34,7 @@ class SettingsScreen extends React.Component {
   getArtisanProfile = async () => {
     try {
       const value = await AsyncStorage.getItem('artisanToken');
+      const id = await AsyncStorage.getItem('userId');
       if (value !== null) {
         const headers = {
           'Content-Type': 'application/json',
@@ -41,24 +42,33 @@ class SettingsScreen extends React.Component {
         };
 
         axios
-          .get(Domain + 'api/artisans/artisan-profile', {
+          .get(Domain + 'api/artisans/artisan/' + id, {
             headers: headers,
           })
           .then(response => {
             this.setState({
               name:
-                response.data[0].artisan.first_name +
+                response.data.artisan.first_name +
                 ' ' +
-                response.data[0].artisan.last_name,
-              email: response.data[0].artisan.email,
-              phoneNumber: response.data[0].phone_number,
-              category: response.data[0].category,
-              photo: response.data[0].profile_picture,
+                response.data.artisan.last_name,
+              email: response.data.artisan.email,
+              // photo: response.data[0].profile_picture,
             });
           })
           .catch(error => {
             this.setState({isLoading: false});
             Alert.alert('An error occured! ' + error.message);
+          });
+        axios
+          .get(Domain + 'api/artisans/profile/' + id, {
+            headers: headers,
+          })
+          .then(response => {
+            this.setState({
+              category: response.data.profile[0].category,
+              photo: response.data.profile[0].profile_picture,
+              phoneNumber: response.data.profile[0].phone_number,
+            });
           });
       }
     } catch (error) {

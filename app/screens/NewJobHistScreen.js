@@ -52,7 +52,7 @@ class TransactScreen extends React.Component {
           Authorization: 'Bearer ' + value,
         };
 
-        const id = await AsyncStorage.getItem('artisanId');
+        const id = await AsyncStorage.getItem('userId');
 
         axios
           .get(Domain + 'api/artisans/artisan-jobs/' + id, {
