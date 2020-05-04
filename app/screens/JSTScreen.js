@@ -11,9 +11,15 @@ import {
   SafeAreaView,
   ScrollView,
   StatusBar,
+  AsyncStorage,
 } from 'react-native';
 import {FloatingTitleTextInputField} from '../components/FloatingHintInput';
 import Icon from 'react-native-vector-icons/Ionicons';
+import io from 'socket.io-client';
+import axios from 'axios';
+import Domain from '../constants/Domain';
+import Loading from '../lotties/Loading';
+import Success from '../lotties/Success';
 
 const screenHeight = Dimensions.get('window').height;
 
@@ -43,6 +49,18 @@ function mapDispatchToProps(dispatch) {
       dispatch({
         type: 'CONFIRM_JOB_DONE',
       }),
+    interimJobDone: () =>
+      dispatch({
+        type: 'INTERIM_JOB_DONE',
+      }),
+    interimArrival: () =>
+      dispatch({
+        type: 'INTERIM_ARRIVAL',
+      }),
+    interimDiagnosis: () =>
+      dispatch({
+        type: 'INTERIM_DIAGNOSIS',
+      }),
     activateConfirmJobDone: () =>
       dispatch({
         type: 'ACTIVATE_CONFIRM_JOB_DONE',
@@ -57,6 +75,204 @@ function mapDispatchToProps(dispatch) {
 class JSTScreen extends React.Component {
   static navigationOptions = {
     title: 'Job Status Tracker',
+  };
+
+  constructor(props) {
+    super(props);
+
+    this.socket = io('http://citiworksApi.test:3000', {jsonp: false});
+
+    // when user confirms arrival
+    this.socket.on(
+      'artisan-arrival-confirmed:App\\Events\\OnArrivedCon',
+      data => {
+        console.log('User confirms arrival', data);
+        this.checkBroadCastByUserId(data.jobId, 'Arrival');
+      },
+    );
+
+    // when user confirms diagnosis completion
+    this.socket.on(
+      'job-diagnosis-confirmed:App\\Events\\OnDiagnosedCon',
+      data => {
+        console.log('User confirms diagnosis completion', data);
+        this.checkBroadCastByUserId(data.jobId, 'Diagnosis');
+      },
+    );
+
+    this.socket.on(
+      'user-confirms-job-completion:App\\Events\\OnCompletedCon',
+      data => {
+        console.log('User confirms job completion', data);
+        this.checkBroadCastByUserId(data.jobId, 'Completion');
+      },
+    );
+  }
+
+  // getActiveJob = () => {
+  //   try{
+  //     const token = await AsyncStorage.getItem('artisanToken');
+  //     const clientID = await AsyncStorage.getItem('clientID');
+  //     const jobTime = await AsyncStorage.getItem('jobTime');
+
+  //     const headers = {
+  //       'Content-Type': 'application/json',
+  //       Authorization: 'Bearer ' + token,
+  //     };
+
+  //     axios.get(Domain + 'api/artisans/get-active-job/'+ clientID + '/' + jobTime, {
+  //       headers: headers,
+  //     }).then(response => {
+  //       this.setState({
+  //         jobId: response.data.job.job
+  //       });
+  //     });
+  //   } catch (error) {
+  //     // Error retrieving data
+  //     Alert.alert('A try catch error occured!');
+  //   }
+  // };
+
+  checkBroadCastByArtisanId = async (jobId, status) => {
+    try {
+      const value = await AsyncStorage.getItem('artisanToken');
+      const id = await AsyncStorage.getItem('userId');
+      if (value !== null) {
+        const headers = {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + value,
+        };
+
+        axios
+          .get(Domain + 'api/artisans/single-job/' + jobId, {
+            headers: headers,
+          })
+          .then(response => {
+            if (id == response.data.job.artisan_id) {
+              this.storeJobId(jobId);
+              if (status == 'Arrival') {
+                this.setFirstPhase();
+              } else if (status == 'Diagnosis') {
+                this.setSecondPhase();
+              } else if (status == 'Completion') {
+                this.setThirdPhase();
+              }
+            } else {
+            }
+          })
+          .catch(error => {
+            Alert.alert('An error occured! ' + error.message);
+          });
+      }
+    } catch (error) {
+      // Error retrieving data
+      Alert.alert('An error occured during the try catch session!');
+    }
+  };
+
+  conArrival = async () => {
+    this.setState({isLoading: true});
+    try {
+      const value = await AsyncStorage.getItem('artisanToken');
+      if (value !== null) {
+        const headers = {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + value,
+        };
+
+        const job_id = await AsyncStorage.getItem('jobId');
+
+        let id = {
+          real_job_id: job_id,
+        };
+
+        axios
+          .post(Domain + 'api/artisans/create-arrival', id, {
+            headers: headers,
+          })
+          .then(response => {
+            console.log(response.data);
+            Alert.alert(response.data.message);
+            this.setInterimFirstPhase();
+          })
+          .catch(error => {
+            Alert.alert('An error occured! ' + error.message);
+          });
+      }
+    } catch (error) {
+      // Error retrieving data
+      Alert.alert('A try catch error occured!');
+    }
+  };
+
+  confirmDiagnosis = async () => {
+    this.setState({isLoading: true});
+    try {
+      const value = await AsyncStorage.getItem('artisanToken');
+      if (value !== null) {
+        const headers = {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + value,
+        };
+
+        const job_id = await AsyncStorage.getItem('jobId');
+
+        let id = {
+          real_job_id: job_id,
+        };
+
+        axios
+          .post(Domain + 'api/artisans/create-diagnosis', id, {
+            headers: headers,
+          })
+          .then(response => {
+            console.log(response.data);
+            Alert.alert(response.data.message);
+            this.setInterimSecondPhase();
+          })
+          .catch(error => {
+            Alert.alert('An error occured! ' + error.message);
+          });
+      }
+    } catch (error) {
+      // Error retrieving data
+      Alert.alert('A try catch error occured!');
+    }
+  };
+
+  confirmCompletion = async () => {
+    this.setState({isLoading: true});
+    try {
+      const value = await AsyncStorage.getItem('artisanToken');
+      if (value !== null) {
+        const headers = {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + value,
+        };
+
+        const job_id = await AsyncStorage.getItem('jobId');
+
+        let id = {
+          real_job_id: job_id,
+        };
+
+        axios
+          .post(Domain + 'api/artisans/request-completion', id, {
+            headers: headers,
+          })
+          .then(response => {
+            console.log(response.data);
+            Alert.alert(response.data.message);
+            this.setInterimThirdPhase();
+          })
+          .catch(error => {
+            Alert.alert('An error occured! ' + error.message);
+          });
+      }
+    } catch (error) {
+      // Error retrieving data
+      Alert.alert('A try catch error occured!');
+    }
   };
 
   _updateMasterState = (attrName, value) => {
@@ -104,12 +320,15 @@ class JSTScreen extends React.Component {
     thirdDisable: true,
     proceedDisable: true,
     proceedColor: '#B8BECE',
-    firstTip: 'waiting for the user to confirm arrival',
-    secondTip: 'waiting for user to confirm diagnosis',
-    thirdTip: 'waiting for user to confirm job completion',
+    firstTip: '',
+    secondTip: '',
+    thirdTip: '',
     top: new Animated.Value(screenHeight + 300),
     scale: new Animated.Value(1.3),
     translateY: new Animated.Value(0),
+    isLoading: false,
+    isSuccessful: false,
+    jobId: '',
   };
 
   configureComponent = () => {
@@ -158,7 +377,7 @@ class JSTScreen extends React.Component {
         },
         {
           text: 'Yes',
-          onPress: () => this.setFirstPhase(),
+          onPress: () => this.conArrival(),
         },
       ],
       {
@@ -180,7 +399,7 @@ class JSTScreen extends React.Component {
         },
         {
           text: 'Yes',
-          onPress: () => this.setThirdPhase(),
+          onPress: () => this.confirmCompletion(),
         },
       ],
       {
@@ -188,6 +407,21 @@ class JSTScreen extends React.Component {
       },
     );
     return true;
+  };
+
+  setInterimFirstPhase = () => {
+    this.props.interimArrival();
+    this.setState({
+      firstBorderColor: '#B8BECE',
+      firstBtnColor: '#B8BECE',
+      firstDisable: true,
+      firstTextColor: '#B8BECE',
+      firstTitleColor: '#B8BECE',
+      firstTip: 'waiting for the user to confirm arrival',
+    });
+    // setTimeout(() => {
+    //   this.setFirstPhase();
+    // }, 3000);
   };
 
   setFirstPhase = () => {
@@ -201,6 +435,7 @@ class JSTScreen extends React.Component {
       firstTitleColor: '#30D769',
       firstValue: 'Arrived',
       firstValueColor: '#30D769',
+      firstTip: '',
       secondBorderColor: '#2C3F70',
       secondBtnColor: '#c85a23',
       secondDisable: false,
@@ -209,6 +444,21 @@ class JSTScreen extends React.Component {
       secondValue: 'Pending',
       secondValueColor: '#2C3F70',
     });
+  };
+
+  setInterimSecondPhase = () => {
+    this.props.interimDiagnosis();
+    this.setState({
+      secondBorderColor: '#B8BECE',
+      secondBtnColor: '#B8BECE',
+      secondDisable: true,
+      secondTextColor: '#B8BECE',
+      secondTitleColor: '#B8BECE',
+      secondTip: 'waiting for the user to confirm Diagnosis',
+    });
+    // setTimeout(() => {
+    //   this.setSecondPhase();
+    // }, 3000);
   };
 
   setSecondPhase = () => {
@@ -222,6 +472,7 @@ class JSTScreen extends React.Component {
       secondTitleColor: '#30D769',
       secondValue: 'Completed',
       secondValueColor: '#30D769',
+      secondTip: '',
       thirdBorderColor: '#2C3F70',
       thirdBtnColor: '#c85a23',
       thirdDisable: false,
@@ -232,8 +483,22 @@ class JSTScreen extends React.Component {
     });
   };
 
+  setInterimThirdPhase = () => {
+    this.props.interimJobDone();
+    this.setState({
+      thirdBorderColor: '#B8BECE',
+      thirdBtnColor: '#B8BECE',
+      thirdDisable: true,
+      thirdTextColor: '#B8BECE',
+      thirdTitleColor: '#B8BECE',
+      thirdTip: 'waiting for the user to confirm Job completion',
+    });
+    // setTimeout(() => {
+    //   this.setThirdPhase();
+    // }, 3000);
+  };
+
   setThirdPhase = () => {
-    this.props.activateConfirmJobDone();
     this.setState({
       thirdBorderColor: '#30D769',
       thirdBtnColor: '#30D769',
@@ -242,11 +507,16 @@ class JSTScreen extends React.Component {
       thirdTextColor: '#30D769',
       thirdTitleColor: '#30D769',
       thirdValue: 'Completed',
+      thirdTip: '',
       thirdValueColor: '#30D769',
       proceedDisable: false,
       proceedColor: '#c85a23',
     });
   };
+
+  // componentDidMount() {
+  //   this.retrieveStoredState();
+  // }
 
   componentWillUnmount() {
     BackHandler.removeEventListener(
@@ -255,7 +525,37 @@ class JSTScreen extends React.Component {
     );
   }
 
+  // to store the Job status Tracker redux state
+  storeState = async reduxState => {
+    try {
+      await AsyncStorage.setItem('state', reduxState);
+    } catch (error) {}
+  };
+
+  // to retrieve the stored redux JST state
+  retrieveStoredState = async () => {
+    try {
+      const storedState = await AsyncStorage.getItem('state');
+      if (storedState !== null) {
+        if (storedState == 'activateConfirmDiagnosis') {
+          this.setFirstPhase();
+        } else if (storedState == 'activateConfirmJobDone') {
+          this.setSecondPhase();
+        } else if (storedState == 'interimArrival') {
+          this.setInterimFirstPhase();
+        } else if (storedState == 'interimDiagnosis') {
+          this.setInterimSecondPhase();
+        } else if (storedState == 'interimJobDone') {
+          this.setInterimThirdPhase();
+        } else {
+          this.props.undoConfirmArrival();
+        }
+      }
+    } catch (error) {}
+  };
+
   handleBackClicked = () => {
+    //this.storeState(this.props.action);
     this.props.homeMode();
   };
 
@@ -307,7 +607,7 @@ class JSTScreen extends React.Component {
             <TouchableOpacity
               disable={this.state.disable}
               onPress={() => {
-                this.props.navigation.navigate('Done');
+                this.props.navigation.replace('Jobs');
               }}
               style={{marginTop: 30}}>
               <Button style={{backgroundColor: this.state.proceedColor}}>
@@ -357,7 +657,7 @@ class JSTScreen extends React.Component {
                     }}
                   />
                 </InputView>
-                <TouchableOpacity onPress={this.setSecondPhase}>
+                <TouchableOpacity onPress={this.confirmDiagnosis}>
                   <Button>
                     <BtnText>Next</BtnText>
                   </Button>
@@ -374,6 +674,8 @@ class JSTScreen extends React.Component {
             </AnimatedContainer>
           </Container>
         </ScrollView>
+        <Loading isActive={this.state.isLoading} />
+        <Success isActive={this.state.isSuccessful} />
       </SafeAreaView>
     );
   }

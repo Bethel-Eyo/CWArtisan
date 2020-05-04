@@ -109,8 +109,9 @@ const Value = styled.Text`
 `;
 
 const Tip = styled.Text`
-  font-size: 15px;
-  color: #b8bece;
+  font-size: 14px;
+  font-weight: bold;
+  color: #c85a23;
   margin-top: 15px;
   margin-left: 10px;
 `;

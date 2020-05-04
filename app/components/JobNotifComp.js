@@ -59,10 +59,10 @@ class JobNotifComp extends React.Component {
       <AnimatedContainer style={{top: this.state.top}}>
         <Casing>
           <Row>
-            <ProfilePix source={require('../assets/userdp.jpg')} />
+            <ProfilePix source={{uri: this.props.photo}} />
             <Column>
-              <Name>Kamila Sulaiman</Name>
-              <Location>Lekki, Lagos, Nigeria.</Location>
+              <Name>{this.props.name}</Name>
+              <Location>{this.props.address}</Location>
             </Column>
           </Row>
           <TouchableOpacity>

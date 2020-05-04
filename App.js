@@ -27,18 +27,24 @@ const reducer = (state = initialState, action) => {
       return {...state, action: 'openSupport'};
     case 'CONFIRM_ARRIVAL':
       return {...state, action: 'confirmArrival'};
+    case 'INTERIM_ARRIVAL':
+      return {...state, action: 'interimArrival'};
     case 'UNDO_CONFIRM_ARRIVAL':
       return {...state, action: 'undoConfirmArrival'};
     case 'ACTIVATE_CONFIRM_DIAGNOSIS':
       return {...state, action: 'activateConfirmDiagnosis'};
     case 'CONFIRM_DIAGNOSIS':
       return {...state, action: 'confirmDiagnosis'};
+    case 'INTERIM_DIAGNOSIS':
+      return {...state, action: 'interimDiagnosis'};
     case 'UNDO_CONFIRM_DIAGNOSIS':
       return {...state, action: 'undoConfirmDiagnosis'};
     case 'ACTIVATE_CONFIRM_JOB_DONE':
       return {...state, action: 'activateConfirmJobDone'};
     case 'CONFIRM_JOB_DONE':
       return {...state, action: 'confirmJobDone'};
+    case 'INTERIM_JOB_DONE':
+      return {...state, action: 'interimJobDone'};
     case 'UNDO_CONFIRM_JOB_DONE':
       return {...state, action: 'undoConfirmJobDone'};
     case 'OPEN_REQUEST':

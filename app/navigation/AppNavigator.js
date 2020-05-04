@@ -13,6 +13,12 @@ import TransactScreen from '../screens/NewJobHistScreen';
 import ChangePasScreen from '../screens/ChangePasScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import JobDetailScreen from '../screens/JobDetailScreen';
+import SocketScreen from '../screens/SocketScreen';
+import JobsNavigator from './JobsNavigator';
+import React from 'react';
+import {Button} from 'react-native';
+
+const MyJobStack = JobsNavigator;
 
 const AppNavigator = createStackNavigator(
   {
@@ -29,10 +35,25 @@ const AppNavigator = createStackNavigator(
     ChangePassword: ChangePasScreen,
     Settings: SettingsScreen,
     JobDetail: JobDetailScreen,
+    Sock: SocketScreen,
+    Jobs: {
+      screen: MyJobStack,
+      navigationOptions: ({navigation}) => ({
+        title: 'My Jobs',
+        headerStyle: {
+          backgroundColor: '#C85A23',
+          elevation: 0,
+        },
+        headerTintColor: '#fff',
+        headerTitleStyle: {
+          fontWeight: 'bold',
+        },
+      }),
+    },
   },
   {
     initialRouteName: 'Login',
-    // headerMode: 'none',
+    //headerMode: 'none',
   },
 );
 

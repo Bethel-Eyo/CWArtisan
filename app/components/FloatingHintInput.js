@@ -44,6 +44,7 @@ export class FloatingTitleTextInputField extends Component {
       Animated.timing(this.position, {
         toValue: 1,
         duration: 150,
+        useNativeDriver: true,
       }).start();
     }
     this.props.updateIconState();
@@ -55,6 +56,7 @@ export class FloatingTitleTextInputField extends Component {
       Animated.timing(this.position, {
         toValue: 0,
         duration: 150,
+        useNativeDriver: true,
       }).start();
     }
     this.props.updateBlurState();
@@ -75,10 +77,14 @@ export class FloatingTitleTextInputField extends Component {
     } = this.props;
 
     return {
-      top: this.position.interpolate({
-        inputRange: [0, 1],
-        outputRange: [14, 0],
-      }),
+      transform: [
+        {
+          translateY: this.position.interpolate({
+            inputRange: [0, 1],
+            outputRange: [14, 0],
+          }),
+        },
+      ],
       fontSize: isFieldActive ? titleActiveSize : titleInActiveSize,
       color: isFieldActive ? titleActiveColor : titleInactiveColor,
     };

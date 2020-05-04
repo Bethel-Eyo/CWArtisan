@@ -47,7 +47,7 @@ class HomeScreen extends React.Component {
 
   componentDidUpdate() {
     if (this.props.action == 'openJobHist') {
-      this.props.navigation.navigate('JobHist');
+      this.props.navigation.navigate('Jobs');
     } else if (this.props.action == 'homeJobTracker') {
       this.props.navigation.navigate('JST');
     } else if (this.props.action == 'openWallet') {
@@ -190,6 +190,15 @@ class HomeScreen extends React.Component {
             </CircularView>
           </TouchableOpacity>
         </ThirdView>
+        <TouchableOpacity
+          onPress={() => {
+            this.props.navigation.navigate('Sock');
+          }}
+          style={{position: 'absolute', bottom: 40, right: 80}}>
+          <Button>
+            <BtnText>Test Socket</BtnText>
+          </Button>
+        </TouchableOpacity>
         <Notifications />
       </Container>
     );
@@ -207,6 +216,24 @@ const Circle = styled.View`
 
 const Container = styled.View`
   flex: 1;
+`;
+
+const Button = styled.View`
+  background: #f24505;
+  height: 45px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 30px;
+  box-shadow: 0 5px 5px #c2cbff;
+  margin-top: 10px;
+  width: 230px;
+`;
+
+const BtnText = styled.Text`
+  color: white;
+  font-size: 17px;
+  text-transform: uppercase;
+  font-family: Ionicons;
 `;
 
 const CircularView = styled.View`
