@@ -30,14 +30,13 @@ function mapDispatchToProps(dispatch) {
 class OngoingJobs extends React.Component {
   state = {
     jobs: [],
-    visibility: false,
   };
 
   componentDidUpdate() {
     if (this.props.action == 'goToTracker') {
-      this.setState({
-        visibility: true,
-      });
+      console.log('go to tracker clicked');
+      this.props.navigation.navigate('JST');
+      //Alert.alert('go to tracker clicked');
     }
   }
 
@@ -100,13 +99,17 @@ class OngoingJobs extends React.Component {
       };
 
       axios
-        .get(Domain + 'api/aritsans/get-ongoing-jobs/' + id, {
+        .get(Domain + 'api/artisans/get-ongoing-jobs/' + id, {
           headers: headers,
         })
         .then(response => {
+          console.log('got ongoing jobs');
           this.setState({
             jobs: response.data.jobs,
           });
+        })
+        .catch(error => {
+          Alert.alert('An error occured! ' + error.message);
         });
     } catch (error) {
       // Error retrieving data
@@ -125,27 +128,17 @@ class OngoingJobs extends React.Component {
     this.props.homeMode();
   };
 
-  storeJobId = async jobId => {
-    try {
-      await AsyncStorage.setItem('jobId', jobId);
-      this.props.navigation.navigate('JST');
-    } catch (error) {
-      // Error retrieving data
-      Alert.alert('An error occured during the try catch session!');
-    }
-  };
-
   render() {
     return (
       <Container>
         <StatusBar barStyle="light-content" backgroundColor="#AC5428" />
         {this.state.jobs.map((job, index) => (
           <View key={index}>
-            {visibility == true && this.storeJobId(job.id)}
             <JobsComp
-              name={this.getUserName(job.user_id)}
+              // name={this.getUserName(job.user_id)}
               location={job.job_location}
-              photo={this.getUserPhoto(job.user_id)}
+              jobId={job.id}
+              // photo={this.getUserPhoto(job.user_id)}
               category={job.category}
               date={job.created_at}
               status="ongoing"
@@ -157,6 +150,10 @@ class OngoingJobs extends React.Component {
       </Container>
     );
   }
+}
+
+{
+  /* {this.state.visibility == true && this.storeJobId(job.id)} */
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(OngoingJobs);

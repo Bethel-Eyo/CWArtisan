@@ -76,7 +76,7 @@ class Notifications extends React.Component {
 
   render() {
     return (
-      <AnimatedContainer style={{top: this.state.top}}>
+      <AnimatedContainer style={{top: this.state.top, elevation: 7}}>
         <TouchableOpacity
           onPress={this.props.closeNotif}
           style={{

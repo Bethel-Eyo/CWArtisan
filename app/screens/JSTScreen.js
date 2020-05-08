@@ -20,6 +20,7 @@ import axios from 'axios';
 import Domain from '../constants/Domain';
 import Loading from '../lotties/Loading';
 import Success from '../lotties/Success';
+import Socket from '../constants/Socket';
 
 const screenHeight = Dimensions.get('window').height;
 
@@ -80,14 +81,14 @@ class JSTScreen extends React.Component {
   constructor(props) {
     super(props);
 
-    this.socket = io('http://citiworksApi.test:3000', {jsonp: false});
+    this.socket = io(Socket, {jsonp: false});
 
     // when user confirms arrival
     this.socket.on(
       'artisan-arrival-confirmed:App\\Events\\OnArrivedCon',
       data => {
         console.log('User confirms arrival', data);
-        this.checkBroadCastByUserId(data.jobId, 'Arrival');
+        this.checkBroadCastByArtisanId(data.jobId, 'Arrival');
       },
     );
 
@@ -96,7 +97,7 @@ class JSTScreen extends React.Component {
       'job-diagnosis-confirmed:App\\Events\\OnDiagnosedCon',
       data => {
         console.log('User confirms diagnosis completion', data);
-        this.checkBroadCastByUserId(data.jobId, 'Diagnosis');
+        this.checkBroadCastByArtisanId(data.jobId, 'Diagnosis');
       },
     );
 
@@ -104,7 +105,7 @@ class JSTScreen extends React.Component {
       'user-confirms-job-completion:App\\Events\\OnCompletedCon',
       data => {
         console.log('User confirms job completion', data);
-        this.checkBroadCastByUserId(data.jobId, 'Completion');
+        this.checkBroadCastByArtisanId(data.jobId, 'Completion');
       },
     );
   }
@@ -149,7 +150,7 @@ class JSTScreen extends React.Component {
           })
           .then(response => {
             if (id == response.data.job.artisan_id) {
-              this.storeJobId(jobId);
+              //this.storeJobId(jobId);
               if (status == 'Arrival') {
                 this.setFirstPhase();
               } else if (status == 'Diagnosis') {
@@ -171,6 +172,7 @@ class JSTScreen extends React.Component {
   };
 
   conArrival = async () => {
+    this.props.undoConfirmArrival();
     this.setState({isLoading: true});
     try {
       const value = await AsyncStorage.getItem('artisanToken');
@@ -194,18 +196,24 @@ class JSTScreen extends React.Component {
             console.log(response.data);
             Alert.alert(response.data.message);
             this.setInterimFirstPhase();
+            this.setState({isLoading: false});
           })
           .catch(error => {
             Alert.alert('An error occured! ' + error.message);
+            this.setState({isLoading: false});
           });
       }
     } catch (error) {
       // Error retrieving data
       Alert.alert('A try catch error occured!');
+      this.setState({isLoading: false});
     }
   };
 
   confirmDiagnosis = async () => {
+    // to first make the dialog disappear down
+    this.props.undoConfirmDiagnosis();
+
     this.setState({isLoading: true});
     try {
       const value = await AsyncStorage.getItem('artisanToken');
@@ -219,6 +227,9 @@ class JSTScreen extends React.Component {
 
         let id = {
           real_job_id: job_id,
+          job_title: this.state.jobTitle,
+          cost_of_materials: this.state.costOfMaterials,
+          service_charge: this.state.serviceCharge,
         };
 
         axios
@@ -229,18 +240,22 @@ class JSTScreen extends React.Component {
             console.log(response.data);
             Alert.alert(response.data.message);
             this.setInterimSecondPhase();
+            this.setState({isLoading: false});
           })
           .catch(error => {
             Alert.alert('An error occured! ' + error.message);
+            this.setState({isLoading: false});
           });
       }
     } catch (error) {
       // Error retrieving data
       Alert.alert('A try catch error occured!');
+      this.setState({isLoading: false});
     }
   };
 
   confirmCompletion = async () => {
+    this.props.undoConfirmJobDone();
     this.setState({isLoading: true});
     try {
       const value = await AsyncStorage.getItem('artisanToken');
@@ -264,14 +279,17 @@ class JSTScreen extends React.Component {
             console.log(response.data);
             Alert.alert(response.data.message);
             this.setInterimThirdPhase();
+            this.setState({isLoading: false});
           })
           .catch(error => {
             Alert.alert('An error occured! ' + error.message);
+            this.setState({isLoading: false});
           });
       }
     } catch (error) {
       // Error retrieving data
       Alert.alert('A try catch error occured!');
+      this.setState({isLoading: false});
     }
   };
 
@@ -329,6 +347,9 @@ class JSTScreen extends React.Component {
     isLoading: false,
     isSuccessful: false,
     jobId: '',
+    jobTitle: '',
+    costOfMaterials: '',
+    serviceCharge: '',
   };
 
   configureComponent = () => {
@@ -625,17 +646,17 @@ class JSTScreen extends React.Component {
                 backgroundColor: 'rgba(25,0,0,0.7)',
               }}>
               <Casing>
-                <Logo source={require('../assets/citiworks_logo.png')} />
-                <Title>Costing</Title>
+                {/* <Logo source={require('../assets/citiworks_logo.png')} /> */}
+                {/* <Title>Costing</Title> */}
                 <Tip>
                   Please enter the cost of materials and service charge for the
                   execution of the job.
                 </Tip>
                 <InputView>
                   <FloatingTitleTextInputField
-                    attrName="costOfMaterials"
-                    title="Cost of Materials"
-                    value=""
+                    attrName="jobTitle"
+                    title="Job Title"
+                    value={this.state.jobTitle}
                     updateIconState={() => {}}
                     updateBlurState={() => {}}
                     updateMasterState={this._updateMasterState}
@@ -646,14 +667,29 @@ class JSTScreen extends React.Component {
                 </InputView>
                 <InputView>
                   <FloatingTitleTextInputField
-                    attrName="password"
-                    title="Service Charge"
-                    value=""
+                    attrName="costOfMaterials"
+                    title="Cost of Materials"
+                    value={this.state.costOfMaterials}
                     updateIconState={() => {}}
                     updateBlurState={() => {}}
                     updateMasterState={this._updateMasterState}
                     otherTextInputProps={{
                       autoCapitalize: 'none',
+                      keyboardType: 'numeric',
+                    }}
+                  />
+                </InputView>
+                <InputView>
+                  <FloatingTitleTextInputField
+                    attrName="serviceCharge"
+                    title="Service Charge"
+                    value={this.state.serviceCharge}
+                    updateIconState={() => {}}
+                    updateBlurState={() => {}}
+                    updateMasterState={this._updateMasterState}
+                    otherTextInputProps={{
+                      autoCapitalize: 'none',
+                      keyboardType: 'numeric',
                     }}
                   />
                 </InputView>

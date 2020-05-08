@@ -190,7 +190,7 @@ class HomeScreen extends React.Component {
             </CircularView>
           </TouchableOpacity>
         </ThirdView>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           onPress={() => {
             this.props.navigation.navigate('Sock');
           }}
@@ -198,7 +198,7 @@ class HomeScreen extends React.Component {
           <Button>
             <BtnText>Test Socket</BtnText>
           </Button>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <Notifications />
       </Container>
     );

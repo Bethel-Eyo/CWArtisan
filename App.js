@@ -21,6 +21,8 @@ const reducer = (state = initialState, action) => {
       return {...state, action: 'openJobTracker'};
     case 'HOME_JOB_TRACKER':
       return {...state, action: 'homeJobTracker'};
+    case 'GO_TO_TRACKER':
+      return {...state, action: 'goToTracker'};
     case 'OPEN_WALLET':
       return {...state, action: 'openWallet'};
     case 'OPEN_SUPPORT':

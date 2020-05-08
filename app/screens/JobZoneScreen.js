@@ -55,7 +55,13 @@ class JobZoneScreen extends React.Component {
       'citiworks-artisan-request:App\\Events\\UserReqArtisan',
       data => {
         console.log('Data Received', data);
-        this.checkBroadcast(data.artisanId, data.userId, this.socket);
+        this.checkBroadcast(
+          data.artisanId,
+          data.userId,
+          data.category,
+          data.location,
+          this.socket,
+        );
         //this.getUserDetails(data.userId, data.category, data.location);
       },
     );
@@ -64,7 +70,7 @@ class JobZoneScreen extends React.Component {
     });
   }
 
-  checkBroadcast = async (artisanId, userId, socks) => {
+  checkBroadcast = async (artisanId, userId, category, location, socks) => {
     try {
       const id = await AsyncStorage.getItem('userId');
       if (id !== null) {
@@ -159,14 +165,22 @@ class JobZoneScreen extends React.Component {
           })
           .then(response => {
             console.log('Got the user');
-            Alert.alert('Got user');
-            this.storeUserName(
-              response.data.user[0].user.first_name +
+            // Alert.alert('Got user');
+            // this.storeUserName(
+            // response.data.user[0].user.first_name +
+            //   ' ' +
+            //   response.data.user[0].user.last_name,
+            // );
+            // this.storeUserAddress(response.data.user[0].address);
+            // this.storeUserPhoto(response.data.user[0].profile_picture);
+            this.setState({
+              userName:
+                response.data.user[0].user.first_name +
                 ' ' +
                 response.data.user[0].user.last_name,
-            );
-            this.storeUserAddress(response.data.user[0].address);
-            this.storeUserPhoto(response.data.user[0].profile_picture);
+              userAddress: response.data.user[0].address,
+              userPhoto: response.data.user[0].profile_picture,
+            });
             this.props.openRequest();
             socks.disconnect();
           })
@@ -213,7 +227,7 @@ class JobZoneScreen extends React.Component {
         job_location: location,
       };
       axios
-        .post(Domain + '/accept-user-request', accepted, {
+        .post(Domain + 'api/artisans/accept-user-request', accepted, {
           headers: headers,
         })
         .then(response => {

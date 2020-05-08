@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import Icon from 'react-native-vector-icons/Ionicons';
-import {TouchableOpacity} from 'react-native';
+import {TouchableOpacity, Alert, AsyncStorage} from 'react-native';
 import {connect} from 'react-redux';
 
 function mapStateToProps(state) {
@@ -18,6 +18,16 @@ function mapDispatchToProps(dispatch) {
 }
 
 class JobsComp extends React.Component {
+  storeJobId = async jobId => {
+    try {
+      await AsyncStorage.setItem('jobId', jobId);
+      console.log('stored');
+    } catch (error) {
+      // Error retrieving data
+      Alert.alert('An error occured during the try catch session!');
+    }
+  };
+
   render() {
     return (
       <Container>
@@ -47,7 +57,11 @@ class JobsComp extends React.Component {
         <ThirdRow>
           <Icon name="ios-pin" size={24} color="#c85a23" />
           <Time>{this.props.location}</Time>
-          <TouchableOpacity onPress={this.props.goToTracker}>
+          <TouchableOpacity
+            onPress={() => {
+              this.storeJobId(this.props.jobId);
+              this.props.goToTracker();
+            }}>
             <Button style={{elevation: 7}}>
               <BtnText>Go to Tracker</BtnText>
             </Button>

@@ -61,7 +61,11 @@ class Loading extends React.Component {
   render() {
     return (
       <AnimatedContainer
-        style={{top: this.state.top, opacity: this.state.opacity}}>
+        style={{
+          top: this.state.top,
+          opacity: this.state.opacity,
+          elevation: 7,
+        }}>
         <LottieView
           source={require('../assets/loading.json')}
           autoPlay={false}
