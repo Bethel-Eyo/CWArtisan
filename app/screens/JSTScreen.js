@@ -110,30 +110,6 @@ class JSTScreen extends React.Component {
     );
   }
 
-  // getActiveJob = () => {
-  //   try{
-  //     const token = await AsyncStorage.getItem('artisanToken');
-  //     const clientID = await AsyncStorage.getItem('clientID');
-  //     const jobTime = await AsyncStorage.getItem('jobTime');
-
-  //     const headers = {
-  //       'Content-Type': 'application/json',
-  //       Authorization: 'Bearer ' + token,
-  //     };
-
-  //     axios.get(Domain + 'api/artisans/get-active-job/'+ clientID + '/' + jobTime, {
-  //       headers: headers,
-  //     }).then(response => {
-  //       this.setState({
-  //         jobId: response.data.job.job
-  //       });
-  //     });
-  //   } catch (error) {
-  //     // Error retrieving data
-  //     Alert.alert('A try catch error occured!');
-  //   }
-  // };
-
   checkBroadCastByArtisanId = async (jobId, status) => {
     try {
       const value = await AsyncStorage.getItem('artisanToken');
@@ -171,7 +147,71 @@ class JSTScreen extends React.Component {
     }
   };
 
-  conArrival = async () => {
+  getClientId = (confirmType) => {
+    try{
+      const token = await AsyncStorage.getItem('artisanToken');
+      const headers = {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + token,
+      };
+
+      const job_id = await AsyncStorage.getItem('jobId');
+
+      let id = {
+        real_job_id: job_id,
+      };
+
+      axios
+        .get(Domain + 'api/artisans/single-job/' + id, {
+          headers: headers,
+        })
+        .then(response => {
+          this.setState({
+            clientId: response.data.job.user_id
+          });
+          this.getUserDevice(response.data.job.user_id, confirmType);
+        })
+        .catch(error => {
+          Alert.alert('An error occured! ' + error.message);
+        }); 
+    } catch (error) {
+      // Error retrieving data
+      Alert.alert('A try catch error occured!');
+    }
+  };
+
+  getUserDevice = async (userId, confirmType) => {
+    try {
+      const token = await AsyncStorage.getItem('artisanToken');
+      const headers = {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + token,
+      };
+
+      axios
+        .get(Domain + 'api/artisans/get-user-device' + userId, {
+          headers: headers,
+        })
+        .then(response => {
+          if (confirmType == 'Arrival'){
+            this.conArrival(response.data.device.device_token);
+          } else if (confirmType == 'Diagnosis'){
+            this.confirmDiagnosis(response.data.device.device_token);
+          } else if (confirmType == 'Completion') {
+            this.confirmCompletion(response.data.device.device_token);
+          }
+          
+        })
+        .catch(error => {
+          Alert.alert('An error occured! ' + error.message);
+        });
+    } catch (error) {
+      // Error retrieving data
+      Alert.alert('A try catch error occured!');
+    }
+  };
+
+  conArrival = async (userDevice) => {
     this.props.undoConfirmArrival();
     this.setState({isLoading: true});
     try {
@@ -186,6 +226,7 @@ class JSTScreen extends React.Component {
 
         let id = {
           real_job_id: job_id,
+          user_device: userDevice
         };
 
         axios
@@ -210,7 +251,7 @@ class JSTScreen extends React.Component {
     }
   };
 
-  confirmDiagnosis = async () => {
+  confirmDiagnosis = async (userDevice) => {
     // to first make the dialog disappear down
     this.props.undoConfirmDiagnosis();
 
@@ -230,6 +271,7 @@ class JSTScreen extends React.Component {
           job_title: this.state.jobTitle,
           cost_of_materials: this.state.costOfMaterials,
           service_charge: this.state.serviceCharge,
+          user_device: userDevice
         };
 
         axios
@@ -254,7 +296,7 @@ class JSTScreen extends React.Component {
     }
   };
 
-  confirmCompletion = async () => {
+  confirmCompletion = async (userDevice) => {
     this.props.undoConfirmJobDone();
     this.setState({isLoading: true});
     try {
@@ -269,6 +311,7 @@ class JSTScreen extends React.Component {
 
         let id = {
           real_job_id: job_id,
+          user_device: userDevice
         };
 
         axios
@@ -350,6 +393,7 @@ class JSTScreen extends React.Component {
     jobTitle: '',
     costOfMaterials: '',
     serviceCharge: '',
+    clientId: ''
   };
 
   configureComponent = () => {
@@ -398,7 +442,7 @@ class JSTScreen extends React.Component {
         },
         {
           text: 'Yes',
-          onPress: () => this.conArrival(),
+          onPress: () => this.getClientId('Arrival'),
         },
       ],
       {
@@ -420,7 +464,7 @@ class JSTScreen extends React.Component {
         },
         {
           text: 'Yes',
-          onPress: () => this.confirmCompletion(),
+          onPress: () => this.getClientId('Completion'),
         },
       ],
       {
@@ -693,7 +737,9 @@ class JSTScreen extends React.Component {
                     }}
                   />
                 </InputView>
-                <TouchableOpacity onPress={this.confirmDiagnosis}>
+                <TouchableOpacity onPress={() =>
+                {
+                  this.getClientId('Diagnosis')}}>
                   <Button>
                     <BtnText>Next</BtnText>
                   </Button>

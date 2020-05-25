@@ -10,6 +10,7 @@ import io from 'socket.io-client';
 import axios from 'axios';
 import Domain from '../constants/Domain';
 import Socket from '../constants/Socket';
+import PushNotification from 'react-native-push-notification';
 
 function mapStateToProps(state) {
   return {action: state.action};
@@ -44,6 +45,7 @@ class JobZoneScreen extends React.Component {
     userName: '',
     userAddress: '',
     userPhoto: '',
+    userDevice: '',
   };
 
   constructor(props) {
@@ -68,6 +70,121 @@ class JobZoneScreen extends React.Component {
     this.socket.on('disconnect', function() {
       console.log('Client disconnected');
     });
+  }
+
+  configurePushNotification = () => {
+    console.log('called');
+    const that = this;
+    PushNotification.configure({
+      // (optional) Called when Token is generated (iOS and Android)
+      onRegister: function(token) {
+        alert(token.token);
+        console.log(token);
+        that.setState({name: token.token});
+        that.getPrevDeviceToken(token.token);
+      },
+
+      // (required) Called when a remote or local notification is opened or received
+      onNotification: function(notification) {
+        setTimeout(() => {
+          if (!notification['foreground']) {
+            ToastAndroid.show("You've clicked!", ToastAndroid.SHORT);
+          }
+        }, 1);
+        PushNotification.localNotificationSchedule({
+          title: 'Notification with my name',
+          message: notification['userId'], // (required)
+          date: new Date(Date.now()), // in 60 secs
+        });
+      },
+      // IOS ONLY (optional): default: all - Permissions to register.
+      permissions: {
+        alert: true,
+        badge: true,
+        sound: true,
+      },
+
+      senderID: '330321524001',
+
+      popInitialNotification: true,
+      requestPermissions: true,
+    });
+  };
+
+  getPrevDeviceToken = async token => {
+    try {
+      const value = await AsyncStorage.getItem('artisanToken');
+      const id = await AsyncStorage.getItem('userId');
+      if (value !== null) {
+        const headers = {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + value,
+        };
+        axios
+          .get(Domain + 'api/artisans/get-device-token/' + id, {
+            headers: headers,
+          })
+          .then(response => {
+            // set a flag to know if user already has a previous token
+            if (response.data.device.length !== 0) {
+              this.updateDeviceToken(value, id, token);
+            } else {
+              this.storeDeviceToken(value, token);
+            }
+          })
+          .catch(error => {
+            Alert.alert('An error occured! ' + error.message);
+          });
+      }
+    } catch (error) {
+      // Error retrieving data
+      Alert.alert('Error occured during the try catch');
+    }
+  };
+
+  storeDeviceToken = (artisanToken, deviceToken) => {
+    const headers = {
+      'Content-Type': 'application/json',
+      Authorization: 'Bearer ' + artisanToken,
+    };
+
+    let toks = {
+      device_token: deviceToken,
+    };
+
+    axios
+      .post(Domain + 'api/users/store-device', toks, {
+        headers: headers,
+      })
+      .then(response => {
+        console.log(response.data);
+      })
+      .catch(error => {
+        Alert.alert('An error occured! ' + error.message);
+      });
+  };
+
+  updateDeviceToken(artisanToken, userId, deviceToken) {
+    const headers = {
+      'Content-Type': 'application/json',
+      Authorization: 'Bearer ' + artisanToken,
+    };
+
+    let toks = {
+      device_token: deviceToken,
+      user_id: userId,
+    };
+
+    axios
+      .post(Domain + 'api/users/update-device', toks, {
+        headers: headers,
+      })
+      .then(response => {
+        console.log(response.data);
+      })
+      .catch(error => {
+        Alert.alert('An error occured! ' + error.message);
+      });
   }
 
   checkBroadcast = async (artisanId, userId, category, location, socks) => {
@@ -165,14 +282,6 @@ class JobZoneScreen extends React.Component {
           })
           .then(response => {
             console.log('Got the user');
-            // Alert.alert('Got user');
-            // this.storeUserName(
-            // response.data.user[0].user.first_name +
-            //   ' ' +
-            //   response.data.user[0].user.last_name,
-            // );
-            // this.storeUserAddress(response.data.user[0].address);
-            // this.storeUserPhoto(response.data.user[0].profile_picture);
             this.setState({
               userName:
                 response.data.user[0].user.first_name +
@@ -207,7 +316,35 @@ class JobZoneScreen extends React.Component {
   //   }
   // };
 
-  acceptJobRequest = async () => {
+  getUserDevice = async () => {
+    try {
+      const token = await AsyncStorage.getItem('artisanToken');
+      const clientID = await AsyncStorage.getItem('clientID');
+      const headers = {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + token,
+      };
+
+      axios
+        .get(Domain + 'api/artisans/get-user-device' + clientID, {
+          headers: headers,
+        })
+        .then(response => {
+          this.setState({
+            userDevice: response.data.device.device_token,
+          });
+          this.acceptJobRequest(this.state.userDevice);
+        })
+        .catch(error => {
+          Alert.alert('An error occured! ' + error.message);
+        });
+    } catch (error) {
+      // Error retrieving data
+      Alert.alert('A try catch error occured!');
+    }
+  };
+
+  acceptJobRequest = async userDevice => {
     try {
       const token = await AsyncStorage.getItem('artisanToken');
       const clientID = await AsyncStorage.getItem('clientID');
@@ -225,6 +362,7 @@ class JobZoneScreen extends React.Component {
         artisan_id: artisanID,
         category: category,
         job_location: location,
+        user_device: userDevice,
       };
       axios
         .post(Domain + 'api/artisans/accept-user-request', accepted, {
@@ -263,8 +401,9 @@ class JobZoneScreen extends React.Component {
   };
 
   componentDidUpdate() {
+    this.configurePushNotification();
     if (this.props.action == 'openJobTracker') {
-      this.acceptJobRequest();
+      this.getUserDevice();
     }
     this.showRequest();
     // this.retrieveUserName();
