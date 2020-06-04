@@ -110,6 +110,57 @@ class JSTScreen extends React.Component {
     );
   }
 
+  getJobStatus = async () => {
+    try {
+      const value = await AsyncStorage.getItem('artisanToken');
+
+      const job_id = await AsyncStorage.getItem('jobId');
+
+      const headers = {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + value,
+      };
+
+      let id = {
+        real_job_id: job_id,
+      };
+
+      axios
+        .get(Domain + 'api/artisans/single-job/' + id, {
+          headers: headers,
+        })
+        .then(response => {
+          if (response.data.job.stage == 0) {
+          } else if (response.data.job.stage == 0) {
+            console.log('no arrival yet!');
+          } else if (response.data.job.stage == 1) {
+            console.log('Artisan has confirmed Arrival!');
+            this.setInterimFirstPhase();
+          } else if (response.data.job.stage == 2) {
+            console.log('User has confirmed Arrival!');
+            this.setFirstPhase();
+          } else if (response.data.job.stage == 3) {
+            console.log('Artisan has confirmed Dianosis');
+            this.setInterimSecondPhase();
+          } else if (response.data.job.stage == 4) {
+            console.log('User has confirmed Diagnosis');
+            this.setSecondPhase();
+          } else if (response.data.job.stage == 5) {
+            console.log('Artisan has confirmed job completion');
+            this.setInterimThirdPhase();
+          } else if (response.data.job.stage == 6) {
+            console.log('User has confirmed job completion');
+            this.setThirdPhase();
+          }
+        })
+        .catch(error => {
+          Alert.alert('An error occured! ' + error.message);
+        });
+    } catch (error) {
+      Alert.alert('A try catch error occured');
+    }
+  };
+
   checkBroadCastByArtisanId = async (jobId, status) => {
     try {
       const value = await AsyncStorage.getItem('artisanToken');
@@ -147,8 +198,8 @@ class JSTScreen extends React.Component {
     }
   };
 
-  getClientId = (confirmType) => {
-    try{
+  getClientId = async confirmType => {
+    try {
       const token = await AsyncStorage.getItem('artisanToken');
       const headers = {
         'Content-Type': 'application/json',
@@ -167,13 +218,13 @@ class JSTScreen extends React.Component {
         })
         .then(response => {
           this.setState({
-            clientId: response.data.job.user_id
+            clientId: response.data.job.user_id,
           });
           this.getUserDevice(response.data.job.user_id, confirmType);
         })
         .catch(error => {
           Alert.alert('An error occured! ' + error.message);
-        }); 
+        });
     } catch (error) {
       // Error retrieving data
       Alert.alert('A try catch error occured!');
@@ -193,14 +244,13 @@ class JSTScreen extends React.Component {
           headers: headers,
         })
         .then(response => {
-          if (confirmType == 'Arrival'){
+          if (confirmType == 'Arrival') {
             this.conArrival(response.data.device.device_token);
-          } else if (confirmType == 'Diagnosis'){
+          } else if (confirmType == 'Diagnosis') {
             this.confirmDiagnosis(response.data.device.device_token);
           } else if (confirmType == 'Completion') {
             this.confirmCompletion(response.data.device.device_token);
           }
-          
         })
         .catch(error => {
           Alert.alert('An error occured! ' + error.message);
@@ -211,7 +261,7 @@ class JSTScreen extends React.Component {
     }
   };
 
-  conArrival = async (userDevice) => {
+  conArrival = async userDevice => {
     this.props.undoConfirmArrival();
     this.setState({isLoading: true});
     try {
@@ -226,7 +276,7 @@ class JSTScreen extends React.Component {
 
         let id = {
           real_job_id: job_id,
-          user_device: userDevice
+          user_device: userDevice,
         };
 
         axios
@@ -251,7 +301,7 @@ class JSTScreen extends React.Component {
     }
   };
 
-  confirmDiagnosis = async (userDevice) => {
+  confirmDiagnosis = async userDevice => {
     // to first make the dialog disappear down
     this.props.undoConfirmDiagnosis();
 
@@ -271,7 +321,7 @@ class JSTScreen extends React.Component {
           job_title: this.state.jobTitle,
           cost_of_materials: this.state.costOfMaterials,
           service_charge: this.state.serviceCharge,
-          user_device: userDevice
+          user_device: userDevice,
         };
 
         axios
@@ -296,7 +346,7 @@ class JSTScreen extends React.Component {
     }
   };
 
-  confirmCompletion = async (userDevice) => {
+  confirmCompletion = async userDevice => {
     this.props.undoConfirmJobDone();
     this.setState({isLoading: true});
     try {
@@ -311,7 +361,7 @@ class JSTScreen extends React.Component {
 
         let id = {
           real_job_id: job_id,
-          user_device: userDevice
+          user_device: userDevice,
         };
 
         axios
@@ -393,7 +443,7 @@ class JSTScreen extends React.Component {
     jobTitle: '',
     costOfMaterials: '',
     serviceCharge: '',
-    clientId: ''
+    clientId: '',
   };
 
   configureComponent = () => {
@@ -737,9 +787,10 @@ class JSTScreen extends React.Component {
                     }}
                   />
                 </InputView>
-                <TouchableOpacity onPress={() =>
-                {
-                  this.getClientId('Diagnosis')}}>
+                <TouchableOpacity
+                  onPress={() => {
+                    this.getClientId('Diagnosis');
+                  }}>
                   <Button>
                     <BtnText>Next</BtnText>
                   </Button>

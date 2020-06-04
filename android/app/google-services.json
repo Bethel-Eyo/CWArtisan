@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "156486116617",
+    "firebase_url": "https://cwartisan.firebaseio.com",
+    "project_id": "cwartisan",
+    "storage_bucket": "cwartisan.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:156486116617:android:299484436e981a3e9d9fd8",
+        "android_client_info": {
+          "package_name": "com.cwartisan"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "156486116617-j2labqkcdk9au49pa7e9jpkimhjcvc3n.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.cwartisan",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "156486116617-1u0n9tqs5bm1hupo0ri3ctf2dnsshb8k.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCtoDr2gd-xQ7KsXHLn8hVs6grTdNxyZ-o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "156486116617-1u0n9tqs5bm1hupo0ri3ctf2dnsshb8k.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

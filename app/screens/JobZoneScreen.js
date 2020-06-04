@@ -73,13 +73,13 @@ class JobZoneScreen extends React.Component {
   }
 
   configurePushNotification = () => {
-    console.log('called');
+    console.log('belacrus is called');
     const that = this;
     PushNotification.configure({
       // (optional) Called when Token is generated (iOS and Android)
       onRegister: function(token) {
-        alert(token.token);
-        console.log(token);
+        Alert.alert(token.token);
+        console.log('token: ' + token.token);
         that.setState({name: token.token});
         that.getPrevDeviceToken(token.token);
       },
@@ -104,7 +104,7 @@ class JobZoneScreen extends React.Component {
         sound: true,
       },
 
-      senderID: '330321524001',
+      senderID: '156486116617',
 
       popInitialNotification: true,
       requestPermissions: true,
@@ -153,7 +153,7 @@ class JobZoneScreen extends React.Component {
     };
 
     axios
-      .post(Domain + 'api/users/store-device', toks, {
+      .post(Domain + 'api/artisans/store-device', toks, {
         headers: headers,
       })
       .then(response => {
@@ -176,7 +176,7 @@ class JobZoneScreen extends React.Component {
     };
 
     axios
-      .post(Domain + 'api/users/update-device', toks, {
+      .post(Domain + 'api/artisans/update-device', toks, {
         headers: headers,
       })
       .then(response => {
@@ -401,7 +401,6 @@ class JobZoneScreen extends React.Component {
   };
 
   componentDidUpdate() {
-    this.configurePushNotification();
     if (this.props.action == 'openJobTracker') {
       this.getUserDevice();
     }
@@ -412,11 +411,8 @@ class JobZoneScreen extends React.Component {
 
   componentDidMount() {
     this.requestLocationPermission();
-    setTimeout(() => {
-      //Alert.alert('set has timed out');
-      // this.props.openRequest();
-    }, 5000);
     this.showRequest();
+    this.configurePushNotification();
     // this.retrieveUserName();
     // this.retrieveUserAddress();
   }
