@@ -8,6 +8,7 @@ import {
   StatusBar,
   ImageBackground,
   AsyncStorage,
+  Alert,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import axios from 'axios';
@@ -30,6 +31,40 @@ class SettingsScreen extends React.Component {
   componentDidMount() {
     this.getArtisanProfile();
   }
+
+  resetSession = async () => {
+    try {
+      await AsyncStorage.setItem('userToken', '');
+      await AsyncStorage.setItem('userId', '');
+      this.props.navigation.navigate('Login');
+    } catch (error) {
+      Alert.alert(error);
+    }
+  };
+
+  handleLogout = () => {
+    Alert.alert(
+      'Sign Out',
+      'Are you sure you want to Log Out?',
+      [
+        {
+          text: 'Cancel',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel',
+        },
+        {
+          text: 'OK',
+          onPress: () => {
+            this.resetSession();
+          },
+        },
+      ],
+      {
+        cancelable: false,
+      },
+    );
+    return true;
+  };
 
   getArtisanProfile = async () => {
     try {
@@ -250,7 +285,7 @@ class SettingsScreen extends React.Component {
               </TouchableOpacity>
             </AccountView>
             <AccountView style={{elevation: 3}}>
-              <TouchableOpacity>
+              <TouchableOpacity onPress={this.handleLogout}>
                 <Row>
                   <Icon
                     name="ios-log-out"

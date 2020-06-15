@@ -1,7 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
-import {TouchableOpacity, StatusBar} from 'react-native';
+import Loading from '../lotties/Loading';
+import Success from '../lotties/Success';
+import {TouchableOpacity, StatusBar, Alert} from 'react-native';
 import {FloatingTitleTextInputField} from '../components/FloatingHintInput';
+import axios from 'axios';
+import Domain from '../constants/Domain';
 
 class ResetPassword extends React.Component {
   static navigationOptions = {
@@ -9,22 +13,39 @@ class ResetPassword extends React.Component {
   };
 
   state = {
-    email: '',
-    iconEmail: require('../assets/icon-email.png'),
+    password: '',
+    confirmPassword: '',
+    isLoading: false,
+    isSuccessful: false,
   };
 
   _updateMasterState = (attrName, value) => {
     this.setState({[attrName]: value});
   };
 
-  focusEmail = () => {
-    this.setState({
-      iconEmail: require('../assets/icon-email-animated.gif'),
-    });
-  };
+  handleDefaultFocus = () => {};
 
-  handleEmailBlur = () => {
-    this.setState({iconEmail: require('../assets/icon-email.png')});
+  handleDefaultBlur = () => {};
+
+  handlePasswordReset = async () => {
+    this.setState({isLoading: true});
+    let passes = {
+      password: this.state.password,
+      confirm_password: this.state.confirmPassword,
+      artisan_id: this.props.navigation.state.params.userId,
+    };
+    axios
+      .post(Domain + 'api/reset-artisan-password', passes)
+      .then(response => {
+        this.setState({isLoading: false});
+        console.log('Password has been changed');
+        Alert.alert(response.data.message);
+      })
+      .catch(error => {
+        this.setState({isLoading: false});
+        Alert.alert('An error occured! ' + error.message);
+        console.log('An error as occured');
+      });
   };
 
   render() {
@@ -51,27 +72,34 @@ class ResetPassword extends React.Component {
             Artisan
           </SubText>
           <InputView>
-            <IconEmail source={this.state.iconEmail} />
             <FloatingTitleTextInputField
-              attrName="email"
-              title="Email"
-              keyboardType="email-address"
-              value={this.state.email}
-              updateIconState={this.focusEmail}
-              updateBlurState={this.handleEmailBlur}
+              attrName="password"
+              title="Enter New Password"
+              value={this.state.password}
+              updateIconState={this.handleDefaultFocus}
+              updateBlurState={this.handleDefaultBlur}
               updateMasterState={this._updateMasterState}
-              textInputStyles={{
-                // here you can add additional TextInput styles
-                color: 'green',
-                fontSize: 15,
-              }}
               otherTextInputProps={{
-                // here you can add other TextInput props of your choice
+                secureTextEntry: true,
                 autoCapitalize: 'none',
               }}
             />
           </InputView>
-          <TouchableOpacity>
+          <InputView>
+            <FloatingTitleTextInputField
+              attrName="confirmPassword"
+              title="Confirm New Password"
+              value={this.state.confirmPassword}
+              updateIconState={this.handleDefaultFocus}
+              updateBlurState={this.handleDefaultBlur}
+              updateMasterState={this._updateMasterState}
+              otherTextInputProps={{
+                secureTextEntry: true,
+                autoCapitalize: 'none',
+              }}
+            />
+          </InputView>
+          <TouchableOpacity onPress={this.handlePasswordReset}>
             <Button style={{elevation: 6}}>
               <BtnText>Reset Password</BtnText>
             </Button>
@@ -84,7 +112,7 @@ class ResetPassword extends React.Component {
               fontWeight: 'bold',
             }}
             onPress={() => {
-              this.props.navigation.goBack();
+              this.props.navigation.navigate('Login');
             }}>
             Back to Login
           </FgtPass>
@@ -92,6 +120,8 @@ class ResetPassword extends React.Component {
         <TouchableOpacity>
           <TipText>How to become an Artisan</TipText>
         </TouchableOpacity>
+        <Loading isActive={this.state.isLoading} />
+        <Success isActive={this.state.isSuccessful} />
       </Container>
     );
   }
@@ -130,7 +160,7 @@ const LoginContainer = styled.View`
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
   border-radius: 10px;
   margin-top: 10px;
-  height: 240px;
+  height: 285px;
   width: 330px;
   align-items: center;
 `;

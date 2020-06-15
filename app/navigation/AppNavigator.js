@@ -15,8 +15,8 @@ import SettingsScreen from '../screens/SettingsScreen';
 import JobDetailScreen from '../screens/JobDetailScreen';
 import SocketScreen from '../screens/SocketScreen';
 import JobsNavigator from './JobsNavigator';
-import React from 'react';
-import {Button} from 'react-native';
+import ForgotPassword from '../auth/ForgotPassword';
+import Verify from '../auth/Verify';
 
 const MyJobStack = JobsNavigator;
 
@@ -36,6 +36,8 @@ const AppNavigator = createStackNavigator(
     Settings: SettingsScreen,
     JobDetail: JobDetailScreen,
     Sock: SocketScreen,
+    Verify: Verify,
+    ForgotPassword: ForgotPassword,
     Jobs: {
       screen: MyJobStack,
       navigationOptions: ({navigation}) => ({

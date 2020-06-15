@@ -16,6 +16,7 @@ import NotificationButton from '../components/NotificationButton';
 import Notifications from '../components/Notifications';
 import axios from 'axios';
 import Domain from '../constants/Domain';
+import {Rating} from 'react-native-elements';
 
 function mapStateToProps(state) {
   return {action: state.action};
@@ -36,6 +37,7 @@ class HomeScreen extends React.Component {
       'https://raw.githubusercontent.com/Bethel-Eyo/FunUiCodes/master/assets/avatar-default.jpg',
     category: '',
     name: '',
+    rating: 1,
   };
   static navigationOptions = {
     header: null,
@@ -77,6 +79,7 @@ class HomeScreen extends React.Component {
                 response.data.artisan.first_name +
                 ' ' +
                 response.data.artisan.last_name,
+              rating: response.data.artisan.ratings,
               // category: response.data[0].category,
               // photo: response.data[0].profile_picture,
             });
@@ -130,7 +133,7 @@ class HomeScreen extends React.Component {
                   android: {right: 20, top: 15},
                 }),
               }}>
-              <NotificationButton />
+              {/* <NotificationButton /> */}
             </TouchableOpacity>
             <Row
               style={{
@@ -153,8 +156,14 @@ class HomeScreen extends React.Component {
             </Row>
           </TopView>
           <SubRow>
-            <Icon name="ios-star" size={16} color="#1B2EDE" />
-            <Text>Professional</Text>
+            <Rating
+              imageSize={17}
+              readonly
+              startingValue={this.state.rating}
+              // style={{marginTop: 3}}
+            />
+            {/* <Icon name="ios-star" size={16} color="#1B2EDE" />
+            <Text>Professional</Text> */}
           </SubRow>
           <SubRow style={{right: 30}}>
             <Circle />
@@ -199,7 +208,7 @@ class HomeScreen extends React.Component {
             <BtnText>Test Socket</BtnText>
           </Button>
         </TouchableOpacity> */}
-        <Notifications />
+        {/* <Notifications /> */}
       </Container>
     );
   }

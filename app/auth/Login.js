@@ -202,7 +202,7 @@ class Login extends React.Component {
                 fontWeight: 'bold',
               }}
               onPress={() => {
-                this.props.navigation.navigate('ResetPass');
+                this.props.navigation.navigate('ForgotPassword');
               }}>
               Forgot Password?
             </FgtPass>
